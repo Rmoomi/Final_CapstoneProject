@@ -1,0 +1,135 @@
+/* Reset body */
+body {
+  margin: 0;
+  padding: 60px 0;             /* space from top */
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;     /* horizontal center only */
+  background: #f5f6fa;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  overflow-y: auto;            /* scrollable if form is tall */
+}
+.register_header{
+  text-align: center;
+  color: #003366;
+}
+/* Form container */
+.form_container {
+  width: 650px;           /* wider desktop form */
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(0, 0, 100, 0.08);
+  padding: 30px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;                   /* tighter vertical gap */
+}
+.fullname{
+  display: flex;
+  gap: 40px;
+}
+.fullname label{
+  display: block;
+}
+.fullname input{
+  width: 300px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 15px;
+  outline: none;
+  transition: border 0.2s;
+  box-sizing: border-box;  
+}
+.form_container h2 {
+  margin: 0 0 10px 0;
+  text-align: center;
+  font-size: 1.8rem;
+  color: #333;
+  font-weight: 600;
+}
+
+/* Form */
+.form_container form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;                   /* uniform spacing */
+  width: 100%;
+}
+
+.form_container label {
+  font-size: 15px;
+  font-weight: 600;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+.contact_confPass_inputs input{
+  width: 100%;                 
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 15px;
+  outline: none;
+  transition: border 0.2s;
+  box-sizing: border-box;  
+  margin-bottom: 20px;
+}
+/* .form_container input     
+} */
+
+.form_container input:focus {
+  border-color: #007bff;
+}
+
+/* Ensure password group matches width */
+.pass_input {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Password feedback */
+.pass_feedback {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgb(245, 36, 36);
+  margin-top: 4px;
+}
+
+/* Buttons */
+.submitBtn {
+  padding: 14px;
+  background: #007bff;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s, transform 0.1s;
+  width: 100%;                 /* button matches input width */
+}
+
+.submitBtn:hover {
+  background: #0056b3;
+  transform: scale(1.01);
+}
+
+.btn_link {
+  margin-top: 8px;
+  background: none;
+  border: none;
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color 0.2s;
+  align-self: center;
+}
+
+.btn_link:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+/* Responsive */
