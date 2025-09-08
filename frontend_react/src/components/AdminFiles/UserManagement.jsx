@@ -11,6 +11,7 @@ function UserManagement() {
     email: "",
   });
 
+  // fetch users from backend
   const fetchUsers = () => {
     fetch("http://localhost:8080/users")
       .then((res) => res.json())
@@ -58,14 +59,20 @@ function UserManagement() {
         <button className="add-btn">+ Add New User</button>
       </div>
 
-      {/* Summary cards */}
+      {/* ✅ Summary cards */}
       <div className="stats-cards">
         <div className="card blue">
-          <h3>24</h3>
+          <h3>{users.length}</h3> {/* <-- total users from DB */}
           <p>Total Users</p>
         </div>
         <div className="card purple">
-          <h3>3</h3>
+          <h3>
+            {
+              users.filter(
+                (user) => user.role && user.role.toLowerCase() === "admin"
+              ).length
+            }
+          </h3>
           <p>Administrators</p>
         </div>
       </div>
