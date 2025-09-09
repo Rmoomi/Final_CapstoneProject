@@ -234,6 +234,14 @@ body{
   border-radius: 4px;
   cursor: pointer;
 }
+.edit-icon{
+  aspect-ratio: 1/1;
+  width: 37px;
+}
+ .delete-icon{
+  aspect-ratio: 1/1;
+  width: 30px;
+}
 
 .save-btn:hover { background: #45a049; }
 .cancel-btn:hover { background: #e53935; }

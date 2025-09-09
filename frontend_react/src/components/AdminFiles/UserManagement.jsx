@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
 import "../css/UserManagement.css";
+import editIcon from "../../assets/edit-icon.png";
+import deleteIcon from "../../assets/delete-icon.png";
 
 function UserManagement() {
   const [users, setUsers] = useState([]);
   const [editingUser, setEditingUser] = useState(null);
   const [showForm, setShowForm] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false); // ✅ new state
+  const [userToDelete, setUserToDelete] = useState(null); // ✅ store user being deleted
+  const [searchQuery, setSearchQuery] = useState("");
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
     contact: "",
     email: "",
-    password: "", // frontend uses "password"
+    password: "",
   });
 
   // ✅ Fetch users from backend
@@ -34,7 +39,7 @@ function UserManagement() {
       lastname: user.lastname,
       contact: user.contact_num,
       email: user.email,
-      password: "", // reset password unless updated
+      password: "",
     });
   };
 
@@ -49,13 +54,26 @@ function UserManagement() {
     });
   };
 
-  const handleDelete = (id) => {
-    fetch(`http://localhost:8080/users/${id}`, { method: "DELETE" }).then(() =>
-      fetchUsers()
-    );
+  // ✅ Trigger delete modal
+  const confirmDelete = (user) => {
+    setUserToDelete(user);
+    setShowDeleteModal(true);
   };
 
-  // ✅ Add new user (send "pass" instead of "password")
+  // ✅ Perform delete after confirmation
+  const handleDelete = () => {
+    if (userToDelete) {
+      fetch(`http://localhost:8080/users/${userToDelete.user_id}`, {
+        method: "DELETE",
+      }).then(() => {
+        fetchUsers();
+        setShowDeleteModal(false);
+        setUserToDelete(null);
+      });
+    }
+  };
+
+  // ✅ Add new user
   const handleAddUser = (e) => {
     e.preventDefault();
     fetch("http://localhost:8080/users", {
@@ -66,7 +84,7 @@ function UserManagement() {
         lastname: formData.lastname,
         contact: formData.contact,
         email: formData.email,
-        pass: formData.password, // 🔑 backend expects "pass"
+        pass: formData.password,
       }),
     }).then(() => {
       setShowForm(false);
@@ -80,6 +98,15 @@ function UserManagement() {
       fetchUsers();
     });
   };
+
+  // ✅ Filter users by search query
+  const filteredUsers = users.filter((user) => {
+    const fullName = `${user.firstname} ${user.lastname}`.toLowerCase();
+    return (
+      fullName.includes(searchQuery.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
 
   return (
     <div className="user-management">
@@ -108,9 +135,14 @@ function UserManagement() {
         </div>
       </div>
 
-      {/* Search and Filters */}
+      {/* ✅ Search */}
       <div className="controls">
-        <input type="text" placeholder="Search users..." />
+        <input
+          type="text"
+          placeholder="Search users..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
         <select>
           <option>All Roles</option>
           <option>Administrator</option>
@@ -119,70 +151,80 @@ function UserManagement() {
         <button className="filter-btn">More Filters</button>
       </div>
 
-      {/* User list */}
+      {/* ✅ User list */}
       <div className="user-list">
-        {users.map((user) =>
-          editingUser === user.user_id ? (
-            <div className="user-card editing" key={user.user_id}>
-              <input
-                name="firstname"
-                value={formData.firstname}
-                onChange={handleChange}
-              />
-              <input
-                name="lastname"
-                value={formData.lastname}
-                onChange={handleChange}
-              />
-              <input
-                name="contact"
-                value={formData.contact}
-                onChange={handleChange}
-              />
-              <input
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-              <div className="actions">
-                <button onClick={() => handleUpdate(user.user_id)}>Save</button>
-                <button onClick={() => setEditingUser(null)}>Cancel</button>
+        {filteredUsers.length > 0 ? (
+          filteredUsers.map((user) =>
+            editingUser === user.user_id ? (
+              <div className="user-card editing" key={user.user_id}>
+                <input
+                  name="firstname"
+                  value={formData.firstname}
+                  onChange={handleChange}
+                />
+                <input
+                  name="lastname"
+                  value={formData.lastname}
+                  onChange={handleChange}
+                />
+                <input
+                  name="contact"
+                  value={formData.contact}
+                  onChange={handleChange}
+                />
+                <input
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+                <div className="actions">
+                  <button onClick={() => handleUpdate(user.user_id)}>
+                    Save
+                  </button>
+                  <button onClick={() => setEditingUser(null)}>Cancel</button>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="user-card" key={user.user_id}>
-              <div className="avatar">
-                {user.firstname[0]}
-                {user.lastname[0]}
+            ) : (
+              <div className="user-card" key={user.user_id}>
+                <div className="avatar">
+                  {user.firstname[0]}
+                  {user.lastname[0]}
+                </div>
+                <div className="user-info">
+                  <h4>
+                    {user.firstname} {user.lastname}
+                  </h4>
+                  <p>{user.email}</p>
+                  <p>{user.contact_num}</p>
+                </div>
+                <div className="badges">
+                  <span className="role">{user.role || "User"}</span>
+                  <span className="status active">Active</span>
+                </div>
+                <div className="actions">
+                  <button className="edit" onClick={() => handleEdit(user)}>
+                    <img src={editIcon} className="edit-icon" alt="Edit" />
+                  </button>
+                  <button
+                    className="delete"
+                    onClick={() => confirmDelete(user)} // ✅ show modal
+                  >
+                    <img
+                      src={deleteIcon}
+                      className="delete-icon"
+                      alt="Delete"
+                    />
+                  </button>
+                </div>
               </div>
-              <div className="user-info">
-                <h4>
-                  {user.firstname} {user.lastname}
-                </h4>
-                <p>{user.email}</p>
-                <p>{user.contact_num}</p>
-              </div>
-              <div className="badges">
-                <span className="role">{user.role || "User"}</span>
-                <span className="status active">Active</span>
-              </div>
-              <div className="actions">
-                <button className="edit" onClick={() => handleEdit(user)}>
-                  ✏️
-                </button>
-                <button
-                  className="delete"
-                  onClick={() => handleDelete(user.user_id)}
-                >
-                  🗑️
-                </button>
-              </div>
-            </div>
+            )
           )
+        ) : (
+          <p className="no-results">No users found.</p>
         )}
       </div>
 
-      {/* ✅ Modal Form for Add New User */}
+      {/* ✅ Modal Form for Add User */}
       {showForm && (
         <div className="modal-overlay">
           <div className="modal">
@@ -220,7 +262,6 @@ function UserManagement() {
                 onChange={handleChange}
                 required
               />
-              {/* ✅ Password field */}
               <input
                 type="password"
                 name="password"
@@ -242,6 +283,33 @@ function UserManagement() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ Delete confirmation modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal confirm-modal">
+            <h3>Confirm Delete</h3>
+            <p>
+              Are you sure you want to delete{" "}
+              <b>
+                {userToDelete?.firstname} {userToDelete?.lastname}
+              </b>
+              ?
+            </p>
+            <div className="modal-actions">
+              <button onClick={handleDelete} className="delete-btn">
+                Yes
+              </button>
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
