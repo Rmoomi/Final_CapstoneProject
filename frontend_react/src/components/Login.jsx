@@ -21,10 +21,12 @@ function Login() {
         console.log("Server says:", data);
 
         if (data.success) {
-          // 👇 redirect to dashboard only if login is successful
+          // ✅ Save user info in localStorage
+          localStorage.setItem("user", JSON.stringify(data.user));
+
+          // redirect to homepage
           navigate("/homepage");
         } else {
-          // show popup error
           setShowError(true);
           setTimeout(() => setShowError(false), 3000);
         }
