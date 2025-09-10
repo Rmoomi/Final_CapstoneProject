@@ -9,6 +9,11 @@ import ReportGenerator from "./components/AdminFiles/ReportGenerator.jsx";
 import UserManagement from "./components/AdminFiles/UserManagement.jsx";
 import Dashboard from "./components/AdminFiles/Dashboard.jsx"; // placeholder for admin home
 
+import Reservation from "./components/Reservation.jsx";
+import About from "./components/About.jsx";
+import Contact from "./components/Contact.jsx";
+import Feedback from "./components/Feedback.jsx";
+import NavLayout from "./components/NavLayout.jsx";
 function App() {
   return (
     <BrowserRouter>
@@ -17,7 +22,6 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<RegisterAcc />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/homepage" element={<Homepage />} />
 
         {/* Admin layout with nested routes */}
         <Route path="/admin" element={<Admin />}>
@@ -26,6 +30,13 @@ function App() {
           <Route path="reservations" element={<ReservationManagement />} />
           <Route path="feedback" element={<FeedbackManagement />} />
           <Route path="reports" element={<ReportGenerator />} />
+        </Route>
+         <Route element={<NavLayout />}>
+          <Route path="/homepage" element={<Homepage />} />
+          <Route path="/reservation" element={<Reservation />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/feedback" element={<Feedback />} />
         </Route>
       </Routes>
     </BrowserRouter>
