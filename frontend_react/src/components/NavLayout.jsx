@@ -22,6 +22,8 @@ function NavLayout() {
     navigate("/");
   };
 
+  const closeMenu = () => setMenuOpen(false);
+
   return (
     <div>
       {/* Navbar */}
@@ -35,9 +37,9 @@ function NavLayout() {
           EveRest Portal
         </div>
 
-        {/* Hamburger icon (only shows on mobile) */}
-        <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
-          {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+        {/* Hamburger (mobile only) */}
+        <div className="hamburger" onClick={() => setMenuOpen(true)}>
+          <FaBars size={24} />
         </div>
 
         {/* Desktop nav links */}
@@ -65,26 +67,32 @@ function NavLayout() {
           </li>
         </ul>
 
+        {/* Overlay */}
+        {menuOpen && <div className="overlay" onClick={closeMenu}></div>}
+
         {/* Mobile side navigation */}
         <div className={`side-menu ${menuOpen ? "open" : ""}`}>
+          <div className="close-btn" onClick={closeMenu}>
+            <FaTimes size={24} />
+          </div>
           <ul>
             <li>
-              <Link to="/reservation" onClick={() => setMenuOpen(false)}>
+              <Link to="/reservation" onClick={closeMenu}>
                 Reservation
               </Link>
             </li>
             <li>
-              <Link to="/about" onClick={() => setMenuOpen(false)}>
+              <Link to="/about" onClick={closeMenu}>
                 About
               </Link>
             </li>
             <li>
-              <Link to="/contact" onClick={() => setMenuOpen(false)}>
+              <Link to="/contact" onClick={closeMenu}>
                 Contact
               </Link>
             </li>
             <li>
-              <Link to="/feedback" onClick={() => setMenuOpen(false)}>
+              <Link to="/feedback" onClick={closeMenu}>
                 Feedback
               </Link>
             </li>

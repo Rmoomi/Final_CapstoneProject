@@ -71,9 +71,10 @@
 .hamburger {
   display: none;
   cursor: pointer;
+  z-index: 2100; /* above overlay */
 }
 
-/* Side menu (hidden by default) */
+/* Side menu */
 .side-menu {
   position: fixed;
   top: 0;
@@ -83,8 +84,8 @@
   background: #2c3e50;
   color: #fff;
   transition: right 0.3s ease;
-  z-index: 2000;
-  padding-top: 70px; /* avoid navbar */
+  z-index: 2200;
+  padding-top: 70px; /* space below navbar */
 }
 .side-menu.open {
   right: 0;
@@ -103,6 +104,26 @@
 }
 .side-menu a:hover {
   color: #f1c40f;
+}
+
+/* Close button inside side menu */
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  cursor: pointer;
+  color: #fff;
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 2000;
 }
 
 /* Responsive */
