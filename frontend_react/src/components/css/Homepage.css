@@ -1,4 +1,4 @@
-/* Reset some default margins/padding */
+/* Reset */
 * {
   margin: 0;
   padding: 0;
@@ -6,13 +6,13 @@
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Navbar styling */
+/* Navbar */
 .navbar {
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 50px;
+  padding: 15px 20px;
   background-color: #2c3e50;
   color: #fff;
   position: fixed;
@@ -25,8 +25,10 @@
   font-size: 1.5rem;
   font-weight: bold;
   color: #f1c40f;
+  cursor: pointer;
 }
 
+/* Desktop nav links */
 .nav-links {
   list-style: none;
   display: flex;
@@ -49,50 +51,66 @@
   cursor: pointer;
   transition: color 0.3s;
 }
-
 .user-icon:hover {
   color: #f1c40f;
 }
 
-/* Hero section */
-.hero {
-  height: 100vh;
-  background: linear-gradient(rgba(44, 62, 80, 0.8), rgba(44, 62, 80, 0.8)),
-    url("https://images.unsplash.com/photo-1605379399642-870262d3d6d6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1471&q=80")
-      center/cover no-repeat;
+.logout-btn {
+  background: #f1c40f;
+  color: #2c3e50;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.logout-btn:hover {
+  background: #d4ac0d;
+}
+
+/* Hamburger (mobile only) */
+.hamburger {
+  display: none;
+  cursor: pointer;
+}
+
+/* Side menu (hidden by default) */
+.side-menu {
+  position: fixed;
+  top: 0;
+  right: -250px; /* hidden */
+  width: 250px;
+  height: 100%;
+  background: #2c3e50;
+  color: #fff;
+  transition: right 0.3s ease;
+  z-index: 2000;
+  padding-top: 70px; /* avoid navbar */
+}
+.side-menu.open {
+  right: 0;
+}
+.side-menu ul {
+  list-style: none;
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  color: white;
-  padding: 0 20px;
+  gap: 20px;
 }
-
-.hero h1 {
-  font-size: 3rem;
-  margin-bottom: 15px;
-}
-
-.hero p {
-  font-size: 1.2rem;
-  margin-bottom: 25px;
-  max-width: 600px;
-}
-
-.btn {
-  display: inline-block;
-  background-color: #f1c40f;
-  color: #2c3e50;
-  padding: 12px 25px;
-  border-radius: 30px;
-  font-size: 1rem;
-  font-weight: bold;
+.side-menu a {
+  color: #fff;
   text-decoration: none;
-  transition: background 0.3s, transform 0.2s;
+  font-size: 1.2rem;
+}
+.side-menu a:hover {
+  color: #f1c40f;
 }
 
-.btn:hover {
-  background-color: #d4ac0d;
-  transform: translateY(-3px);
+/* Responsive */
+@media (max-width: 768px) {
+  .desktop-menu {
+    display: none; /* hide desktop menu */
+  }
+  .hamburger {
+    display: block;
+  }
 }

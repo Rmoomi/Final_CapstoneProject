@@ -9,10 +9,12 @@ body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   overflow-y: auto;            /* scrollable if form is tall */
 }
-.register_header{
+
+.register_header {
   text-align: center;
   color: #003366;
 }
+
 /* Form container */
 .form_container {
   width: 650px;           /* wider desktop form */
@@ -22,16 +24,19 @@ body {
   padding: 30px 40px;
   display: flex;
   flex-direction: column;
-  gap: 16px;                   /* tighter vertical gap */
+  gap: 16px;                   
 }
-.fullname{
+
+.fullname {
   display: flex;
   gap: 40px;
 }
-.fullname label{
+
+.fullname label {
   display: block;
 }
-.fullname input{
+
+.fullname input {
   width: 265px;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -41,6 +46,7 @@ body {
   transition: border 0.2s;
   box-sizing: border-box;  
 }
+
 .form_container h2 {
   margin: 0 0 10px 0;
   text-align: center;
@@ -53,7 +59,7 @@ body {
 .form_container form {
   display: flex;
   flex-direction: column;
-  gap: 16px;                   /* uniform spacing */
+  gap: 16px;                  
   width: 100%;
 }
 
@@ -64,7 +70,7 @@ body {
   margin-bottom: 6px;
 }
 
-.contact_confPass_inputs input{
+.contact_confPass_inputs input {
   width: 100%;                 
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -75,8 +81,6 @@ body {
   box-sizing: border-box;  
   margin-bottom: 20px;
 }
-/* .form_container input     
-} */
 
 .form_container input:focus {
   border-color: #007bff;
@@ -108,7 +112,7 @@ body {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s, transform 0.1s;
-  width: 100%;                 /* button matches input width */
+  width: 100%;                 
 }
 
 .submitBtn:hover {
@@ -131,5 +135,68 @@ body {
   color: #0056b3;
   text-decoration: underline;
 }
+input, textarea, select {
+  background-color: #fff !important;  /* white background */
+  color: #000 !important;             /* black text */
+  -webkit-text-fill-color: #000 !important; /* iOS Safari autofill fix */
+  box-shadow: 0 0 0px 1000px #fff inset !important; /* override autofill bg */
+}
 
-/* Responsive */
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  background-color: #fff !important;
+  -webkit-box-shadow: 0 0 0px 1000px #fff inset !important;
+  -webkit-text-fill-color: #000 !important;
+}
+
+
+/* ============================= */
+/* RESPONSIVE DESIGN */
+/* ============================= */
+
+/* Tablets */
+@media (max-width: 900px) {
+  .form_container {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .fullname {
+    gap: 20px;
+  }
+
+  .fullname input {
+    width: 100%;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  body {
+    padding: 30px 10px;
+  }
+
+  .form_container {
+    width: 100%;
+    padding: 20px;
+  }
+
+  .fullname {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .fullname input {
+    width: 100%;
+  }
+
+  .form_container h2 {
+    font-size: 1.5rem;
+  }
+
+  .submitBtn {
+    font-size: 15px;
+    padding: 12px;
+  }
+}

@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, Outlet } from "react-router-dom";
-import { FaUserCircle } from "react-icons/fa";
+import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
 import "./css/Homepage.css";
 
 function NavLayout() {
   const [user, setUser] = useState(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,8 +26,22 @@ function NavLayout() {
     <div>
       {/* Navbar */}
       <nav className="navbar">
-        <div className="logo">EveRest Portal</div>
-        <ul className="nav-links">
+        <div
+          className="logo"
+          onClick={() => {
+            navigate("/homepage");
+          }}
+        >
+          EveRest Portal
+        </div>
+
+        {/* Hamburger icon (only shows on mobile) */}
+        <div className="hamburger" onClick={() => setMenuOpen(!menuOpen)}>
+          {menuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
+        </div>
+
+        {/* Desktop nav links */}
+        <ul className="nav-links desktop-menu">
           <li>
             <Link to="/reservation">Reservation</Link>
           </li>
@@ -49,9 +64,44 @@ function NavLayout() {
             </button>
           </li>
         </ul>
+
+        {/* Mobile side navigation */}
+        <div className={`side-menu ${menuOpen ? "open" : ""}`}>
+          <ul>
+            <li>
+              <Link to="/reservation" onClick={() => setMenuOpen(false)}>
+                Reservation
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" onClick={() => setMenuOpen(false)}>
+                About
+              </Link>
+            </li>
+            <li>
+              <Link to="/contact" onClick={() => setMenuOpen(false)}>
+                Contact
+              </Link>
+            </li>
+            <li>
+              <Link to="/feedback" onClick={() => setMenuOpen(false)}>
+                Feedback
+              </Link>
+            </li>
+            <li className="user-icon">
+              <FaUserCircle size={28} />
+              {user && <span className="username"> {user.firstname}</span>}
+            </li>
+            <li>
+              <button onClick={handleLogout} className="logout-btn">
+                Logout
+              </button>
+            </li>
+          </ul>
+        </div>
       </nav>
 
-      {/* Page content will be injected here */}
+      {/* Page content */}
       <Outlet />
     </div>
   );
