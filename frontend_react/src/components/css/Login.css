@@ -4,10 +4,11 @@ body {
   background-color: #ffffff; /* whole page white */
   font-family: sans-serif;
 }
+
 /* Popup notification */
 .popup {
   position: fixed;
-  top: -60px; /* hidden above screen */
+  top: -102px; /* hidden above screen */
   left: 50%;
   transform: translateX(-50%);
   background-color: #e63946; /* red */
@@ -22,7 +23,7 @@ body {
 
 /* When shown */
 .popup.show {
-  top: 20px; /* slide down into view */
+  top: 0px; /* slide down into view */
 }
 
 /* Login */
@@ -60,7 +61,7 @@ body {
 }
 
 .login-box form {
-  width: 400px;
+  width: 100%;
   display: flex;
   flex-direction: column;
   text-align: left;
@@ -116,14 +117,67 @@ body {
   cursor: pointer;
 }
 
-.btn-blue{
+.btn-blue {
   background-color: #007bff;
   color: white;
   margin-top: 15px;
 }
-.btn-blue:hover{
+.btn-blue:hover {
   background: #0056b3;
   transform: scale(1.01);
 }
 
+/* -------------------------
+   RESPONSIVE DESIGN
+------------------------- */
 
+/* Tablets (max-width: 768px) */
+@media (max-width: 768px) {
+  .login-box {
+    max-width: 350px;
+    padding: 2rem;
+  }
+
+  .login-box form {
+    width: 100%;
+  }
+
+  .login-box h2 {
+    font-size: 1.5rem;
+  }
+}
+
+/* Mobile (max-width: 480px) */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 10px;
+  }
+
+  .login-box {
+    max-width: 100%;
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+
+  .login-box h2 {
+    font-size: 1.25rem;
+  }
+
+  .login-box .subtitle {
+    font-size: 0.85rem;
+  }
+
+  .login-box input {
+    padding: 0.65rem;
+    font-size: 0.9rem;
+  }
+
+  .full-width {
+    height: 40px;
+    font-size: 0.9rem;
+  }
+
+  .signup-link {
+    font-size: 0.85rem;
+  }
+}

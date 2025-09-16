@@ -10,8 +10,14 @@ function Login() {
     pass: "",
   });
 
+  // ✅ Handle environment variables for both CRA and Vite
+  const API_URL =
+    import.meta.env?.VITE_API_URL ||
+    process.env.REACT_APP_API_URL ||
+    "http://localhost:8080";
+
   const handleLogin = () => {
-    fetch("http://localhost:8080/login", {
+    fetch(`${API_URL}/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(displayInput),
