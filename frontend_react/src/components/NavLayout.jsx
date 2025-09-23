@@ -155,7 +155,7 @@ function NavLayout() {
             <h3>Are you sure you want to logout?</h3>
             <div className="modal-actions">
               <button onClick={handleLogout} className="confirm-btn">
-                Yes, Logout
+                Logout
               </button>
               <button
                 onClick={() => setShowModal(false)}
