@@ -254,4 +254,57 @@ router.post("/reservation", upload.single("photo"), (req, res) => {
     });
   });
 });
+// Fetch all reservations
+// Fetch all reservations
+router.get("/reservations", (req, res) => {
+  const sql = "SELECT * FROM reservations ORDER BY id DESC";
+  connectDB.query(sql, (err, results) => {
+    if (err) {
+      console.error("Error fetching reservations:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error." });
+    }
+    res.json({ success: true, reservations: results });
+  });
+});
+
+// Update reservation (edit details or update status)
+router.put("/reservations/:id", (req, res) => {
+  const { cemetery, fullname, contact, date, status } = req.body;
+  const { id } = req.params;
+
+  const sql = `
+    UPDATE reservations 
+    SET cemetery=?, fullname=?, contact=?, date=?, status=?
+    WHERE id=?
+  `;
+  const values = [cemetery, fullname, contact, date, status, id];
+
+  connectDB.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Error updating reservation:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error." });
+    }
+    res.json({ success: true, message: "Reservation updated successfully!" });
+  });
+});
+
+// Delete reservation
+router.delete("/reservations/:id", (req, res) => {
+  const { id } = req.params;
+  const sql = "DELETE FROM reservations WHERE id=?";
+  connectDB.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Error deleting reservation:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error." });
+    }
+    res.json({ success: true, message: "Reservation deleted successfully!" });
+  });
+});
+
 module.exports = router;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import "../css/UserManagement.css";
+import "../admin_css/UserManagement.css";
 import editIcon from "../../assets/edit-icon.png";
 import deleteIcon from "../../assets/delete-icon.png";
 
