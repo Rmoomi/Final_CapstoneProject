@@ -13,16 +13,13 @@ function RegisterUser() {
     confirmPass: "",
   };
   const [displayInput, setInput] = useState(initialForm);
-  const API_URL =
-    import.meta.env?.VITE_API_URL ||
-    process.env.REACT_APP_API_URL ||
-    "http://localhost:8080";
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
   // Send form data to backend
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch(`${API_URL}/register`, {
+    fetch(`${API_URL}/api/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
