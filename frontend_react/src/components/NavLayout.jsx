@@ -6,6 +6,7 @@ import "./css/NavBar.css";
 function NavLayout() {
   const [user, setUser] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false); // ✅ modal state
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,6 +20,7 @@ function NavLayout() {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    setShowModal(false); // close modal
     navigate("/");
   };
 
@@ -71,7 +73,10 @@ function NavLayout() {
 
           <li>
             {user ? (
-              <button onClick={handleLogout} className="login-btn">
+              <button
+                onClick={() => setShowModal(true)} // ✅ open modal instead
+                className="login-btn"
+              >
                 Logout
               </button>
             ) : (
@@ -127,7 +132,10 @@ function NavLayout() {
 
             <li>
               {user ? (
-                <button onClick={handleLogout} className="login-btn">
+                <button
+                  onClick={() => setShowModal(true)} // ✅ open modal
+                  className="login-btn"
+                >
                   Logout
                 </button>
               ) : (
@@ -139,6 +147,26 @@ function NavLayout() {
           </ul>
         </div>
       </nav>
+
+      {/* ✅ Logout Confirmation Modal */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Are you sure you want to logout?</h3>
+            <div className="modal-actions">
+              <button onClick={handleLogout} className="confirm-btn">
+                Yes, Logout
+              </button>
+              <button
+                onClick={() => setShowModal(false)}
+                className="cancel-btn"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Page content */}
       <Outlet />
