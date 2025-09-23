@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, Outlet } from "react-router-dom";
 import { FaUserCircle, FaBars, FaTimes } from "react-icons/fa";
-import "./css/Homepage.css";
+import "./css/NavBar.css";
 
 function NavLayout() {
   const [user, setUser] = useState(null);
@@ -28,42 +28,57 @@ function NavLayout() {
     <div>
       {/* Navbar */}
       <nav className="navbar">
+        {/* Logo */}
         <div
           className="logo"
           onClick={() => {
             navigate("/homepage");
           }}
         >
-          EveRest Portal
+          <span className="logo-icon">📍</span> EveRest Portal
         </div>
 
         {/* Hamburger (mobile only) */}
         <div className="hamburger" onClick={() => setMenuOpen(true)}>
-          <FaBars size={24} />
+          <FaBars size={22} />
         </div>
 
         {/* Desktop nav links */}
         <ul className="nav-links desktop-menu">
           <li>
-            <Link to="/reservation">Reservation</Link>
+            <Link to="/homepage">Home</Link>
           </li>
           <li>
-            <Link to="/about">About</Link>
+            <Link to="/map">Digital Cemetery Map</Link>
           </li>
           <li>
-            <Link to="/contact">Contact</Link>
+            <Link to="/reservation">Reservations</Link>
+          </li>
+          <li>
+            <Link to="/notifications">Notifications</Link>
           </li>
           <li>
             <Link to="/feedback">Feedback</Link>
           </li>
-          <li className="user-icon">
-            <FaUserCircle size={28} />
-            {user && <span className="username"> {user.firstname}</span>}
-          </li>
+
+          {/* ✅ Show logged in user's FIRST NAME */}
+          {user && (
+            <li className="user-display">
+              <FaUserCircle size={18} style={{ marginRight: "6px" }} />
+              {user.firstname || "User"}
+            </li>
+          )}
+
           <li>
-            <button onClick={handleLogout} className="logout-btn">
-              Logout
-            </button>
+            {user ? (
+              <button onClick={handleLogout} className="login-btn">
+                Logout
+              </button>
+            ) : (
+              <Link to="/login" className="login-btn">
+                Login
+              </Link>
+            )}
           </li>
         </ul>
 
@@ -73,22 +88,27 @@ function NavLayout() {
         {/* Mobile side navigation */}
         <div className={`side-menu ${menuOpen ? "open" : ""}`}>
           <div className="close-btn" onClick={closeMenu}>
-            <FaTimes size={24} />
+            <FaTimes size={22} />
           </div>
           <ul>
             <li>
+              <Link to="/homepage" onClick={closeMenu}>
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/map" onClick={closeMenu}>
+                Digital Cemetery Map
+              </Link>
+            </li>
+            <li>
               <Link to="/reservation" onClick={closeMenu}>
-                Reservation
+                Reservations
               </Link>
             </li>
             <li>
-              <Link to="/about" onClick={closeMenu}>
-                About
-              </Link>
-            </li>
-            <li>
-              <Link to="/contact" onClick={closeMenu}>
-                Contact
+              <Link to="/notifications" onClick={closeMenu}>
+                Notifications
               </Link>
             </li>
             <li>
@@ -96,14 +116,25 @@ function NavLayout() {
                 Feedback
               </Link>
             </li>
-            <li className="user-icon">
-              <FaUserCircle size={28} />
-              {user && <span className="username"> {user.firstname}</span>}
-            </li>
+
+            {/* ✅ Show logged in user's FIRST NAME in mobile menu */}
+            {user && (
+              <li className="user-display">
+                <FaUserCircle size={18} style={{ marginRight: "6px" }} />
+                {user.firstname || "User"}
+              </li>
+            )}
+
             <li>
-              <button onClick={handleLogout} className="logout-btn">
-                Logout
-              </button>
+              {user ? (
+                <button onClick={handleLogout} className="login-btn">
+                  Logout
+                </button>
+              ) : (
+                <Link to="/login" className="login-btn">
+                  Login
+                </Link>
+              )}
             </li>
           </ul>
         </div>
