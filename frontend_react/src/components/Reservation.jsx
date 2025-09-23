@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./css/Reservation.css";
 
 function Reservation() {
@@ -8,35 +8,74 @@ function Reservation() {
     contact: "",
     date: "",
     photo: null,
+    user_id: null, // ✅ include user_id
   });
+
+  const [loading, setLoading] = useState(false);
+
+  // ✅ Load logged-in user from localStorage
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    if (storedUser && storedUser.id) {
+      setFormData((prev) => ({ ...prev, user_id: storedUser.id }));
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "photo") {
-      setFormData({ ...formData, photo: files[0] }); // save uploaded file
+      setFormData({ ...formData, photo: files[0] });
     } else {
       setFormData({ ...formData, [name]: value });
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Reservation Submitted:", formData);
-    alert("Your reservation request has been submitted!");
-    setFormData({
-      cemetery: "",
-      fullname: "",
-      contact: "",
-      date: "",
-      photo: null,
-    });
+    setLoading(true);
+
+    try {
+      const data = new FormData();
+      data.append("cemetery", formData.cemetery);
+      data.append("fullname", formData.fullname);
+      data.append("contact", formData.contact);
+      data.append("date", formData.date);
+      data.append("photo", formData.photo);
+      data.append("user_id", formData.user_id); // ✅ send user_id
+
+      const res = await fetch("http://localhost:8080/api/reservation", {
+        method: "POST",
+        body: data,
+      });
+
+      const result = await res.json();
+
+      if (result.success) {
+        alert("✅ Reservation submitted successfully!");
+        setFormData({
+          cemetery: "",
+          fullname: "",
+          contact: "",
+          date: "",
+          photo: null,
+          user_id: formData.user_id, // keep user_id
+        });
+        document.getElementById("photo").value = "";
+      } else {
+        alert("❌ Failed: " + result.message);
+      }
+    } catch (err) {
+      console.error("Error submitting reservation:", err);
+      alert("❌ An error occurred while submitting reservation.");
+    }
+
+    setLoading(false);
   };
 
   return (
     <div className="reservation-container">
       <h2>Burial Lot Reservation</h2>
       <form className="reservation-form" onSubmit={handleSubmit}>
-        {/* Cemetery dropdown */}
         <label htmlFor="cemetery">Select Cemetery</label>
         <select
           name="cemetery"
@@ -53,7 +92,6 @@ function Reservation() {
           </option>
         </select>
 
-        {/* Full Name */}
         <label htmlFor="fullname">Full Name</label>
         <input
           type="text"
@@ -65,7 +103,6 @@ function Reservation() {
           required
         />
 
-        {/* Contact */}
         <label htmlFor="contact">Contact Number</label>
         <input
           type="tel"
@@ -77,7 +114,6 @@ function Reservation() {
           required
         />
 
-        {/* Date */}
         <label htmlFor="date">Date of Reservation</label>
         <input
           type="date"
@@ -88,7 +124,6 @@ function Reservation() {
           required
         />
 
-        {/* Photo Upload */}
         <label htmlFor="photo">Photo of the Lot or Area</label>
         <input
           type="file"
@@ -99,9 +134,8 @@ function Reservation() {
           required
         />
 
-        {/* Submit */}
-        <button type="submit" className="submit-btn">
-          Reserve Now
+        <button type="submit" className="submit-btn" disabled={loading}>
+          {loading ? "Submitting..." : "Reserve Now"}
         </button>
       </form>
     </div>

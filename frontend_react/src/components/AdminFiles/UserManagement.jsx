@@ -20,7 +20,7 @@ function UserManagement() {
 
   // ✅ Fetch users from backend
   const fetchUsers = () => {
-    fetch("http://localhost:8080/users")
+    fetch("http://localhost:8080/api/users")
       .then((res) => res.json())
       .then((data) => setUsers(data.users || []));
   };

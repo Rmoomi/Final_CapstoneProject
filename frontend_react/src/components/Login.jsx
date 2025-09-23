@@ -5,41 +5,47 @@ import { useState } from "react";
 function Login() {
   const navigate = useNavigate();
   const [showError, setShowError] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [displayInput, setInput] = useState({
     email: "",
     pass: "",
   });
 
-  // ✅ Handle environment variables for both CRA and Vite
-  const API_URL =
-    import.meta.env?.VITE_API_URL ||
-    process.env.REACT_APP_API_URL ||
-    "http://localhost:8080";
+  // ✅ Use backend URL (set in .env or fallback to localhost:8080)
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-  const handleLogin = () => {
-    fetch(`${API_URL}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(displayInput),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("Server says:", data);
-
-        if (data.success) {
-          // ✅ Save user info in localStorage
-          localStorage.setItem("user", JSON.stringify(data.user));
-
-          // redirect to homepage
-          navigate("/homepage");
-        } else {
-          setShowError(true);
-          setTimeout(() => setShowError(false), 3000);
-        }
-      })
-      .catch((err) => {
-        console.error("Error:", err);
+  const handleLogin = async () => {
+    setLoading(true); // ✅ start loading
+    try {
+      const res = await fetch(`${API_URL}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(displayInput),
       });
+
+      const data = await res.json();
+      console.log("Server says:", data);
+
+      if (res.ok && data.success) {
+        // ✅ Save user info
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // ✅ Redirect
+        navigate("/homepage");
+      } else {
+        showErrorMessage();
+      }
+    } catch (err) {
+      console.error("Error logging in:", err);
+      showErrorMessage();
+    } finally {
+      setLoading(false); // ✅ stop loading
+    }
+  };
+
+  const showErrorMessage = () => {
+    setShowError(true);
+    setTimeout(() => setShowError(false), 3000);
   };
 
   const handleChange = (event) => {
@@ -52,7 +58,7 @@ function Login() {
 
   return (
     <>
-      {/* Pop-up error */}
+      {/* ✅ Error Pop-up */}
       <div className={`popup ${showError ? "show" : ""}`}>
         INVALID USERNAME OR PASSWORD
       </div>
@@ -88,8 +94,8 @@ function Login() {
               required
             />
 
-            <button type="submit" className="btn-blue">
-              SIGN IN
+            <button type="submit" className="btn-blue" disabled={loading}>
+              {loading ? "Signing in..." : "SIGN IN"}
             </button>
           </form>
 
