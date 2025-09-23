@@ -13,6 +13,10 @@ function ReservationManagement() {
     status: "pending",
   });
 
+  // ✅ New states for search & filter
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All Status");
+
   useEffect(() => {
     fetchReservations();
   }, []);
@@ -67,6 +71,19 @@ function ReservationManagement() {
     (r) => r.status === "approved"
   ).length;
 
+  // ✅ Apply search & filter before rendering
+  const filteredReservations = reservations.filter((r) => {
+    const matchesSearch =
+      r.fullname.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      r.cemetery.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      r.contact.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "All Status" || r.status === statusFilter.toLowerCase();
+
+    return matchesSearch && matchesStatus;
+  });
+
   return (
     <div className="reservation-management">
       <div className="header">
@@ -90,10 +107,18 @@ function ReservationManagement() {
         </div>
       </div>
 
-      {/* Search + filters */}
+      {/* ✅ Search + filters */}
       <div className="filters">
-        <input type="text" placeholder="Search reservations..." />
-        <select>
+        <input
+          type="text"
+          placeholder="Search reservations..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
           <option>All Status</option>
           <option>Pending</option>
           <option>Approved</option>
@@ -101,7 +126,7 @@ function ReservationManagement() {
         <button className="btn-secondary">More Filters</button>
       </div>
 
-      {/* Reservations table */}
+      {/* ✅ Reservations table */}
       <table className="reservations-table">
         <thead>
           <tr>
@@ -116,116 +141,127 @@ function ReservationManagement() {
           </tr>
         </thead>
         <tbody>
-          {reservations.map((r) => (
-            <tr key={r.id}>
-              <td>{r.id}</td>
-              <td>
-                {editing === r.id ? (
-                  <input
-                    value={formData.cemetery}
-                    onChange={(e) =>
-                      setFormData({ ...formData, cemetery: e.target.value })
-                    }
-                  />
-                ) : (
-                  r.cemetery
-                )}
-              </td>
-              <td>
-                {editing === r.id ? (
-                  <input
-                    value={formData.fullname}
-                    onChange={(e) =>
-                      setFormData({ ...formData, fullname: e.target.value })
-                    }
-                  />
-                ) : (
-                  r.fullname
-                )}
-              </td>
-              <td>
-                {editing === r.id ? (
-                  <input
-                    value={formData.contact}
-                    onChange={(e) =>
-                      setFormData({ ...formData, contact: e.target.value })
-                    }
-                  />
-                ) : (
-                  r.contact
-                )}
-              </td>
-              <td>
-                {editing === r.id ? (
-                  <input
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) =>
-                      setFormData({ ...formData, date: e.target.value })
-                    }
-                  />
-                ) : (
-                  r.date
-                )}
-              </td>
-              <td>
-                {editing === r.id ? (
-                  <select
-                    value={formData.status}
-                    onChange={(e) =>
-                      setFormData({ ...formData, status: e.target.value })
-                    }
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                  </select>
-                ) : (
-                  <span className={`status ${r.status}`}>{r.status}</span>
-                )}
-              </td>
-              <td>
-                {r.photo ? (
-                  <img
-                    src={`/uploads/${r.photo}`}
-                    alt="reservation"
-                    width="50"
-                  />
-                ) : (
-                  "No photo"
-                )}
-              </td>
-              <td className="actions">
-                {editing === r.id ? (
-                  <>
-                    <button
-                      className="btn-save"
-                      onClick={() => handleUpdate(r.id)}
+          {filteredReservations.length > 0 ? (
+            filteredReservations.map((r) => (
+              <tr key={r.id}>
+                <td>{r.id}</td>
+                <td>
+                  {editing === r.id ? (
+                    <input
+                      value={formData.cemetery}
+                      onChange={(e) =>
+                        setFormData({ ...formData, cemetery: e.target.value })
+                      }
+                    />
+                  ) : (
+                    r.cemetery
+                  )}
+                </td>
+                <td>
+                  {editing === r.id ? (
+                    <input
+                      value={formData.fullname}
+                      onChange={(e) =>
+                        setFormData({ ...formData, fullname: e.target.value })
+                      }
+                    />
+                  ) : (
+                    r.fullname
+                  )}
+                </td>
+                <td>
+                  {editing === r.id ? (
+                    <input
+                      value={formData.contact}
+                      onChange={(e) =>
+                        setFormData({ ...formData, contact: e.target.value })
+                      }
+                    />
+                  ) : (
+                    r.contact
+                  )}
+                </td>
+                <td>
+                  {editing === r.id ? (
+                    <input
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) =>
+                        setFormData({ ...formData, date: e.target.value })
+                      }
+                    />
+                  ) : (
+                    r.date
+                  )}
+                </td>
+                <td>
+                  {editing === r.id ? (
+                    <select
+                      value={formData.status}
+                      onChange={(e) =>
+                        setFormData({ ...formData, status: e.target.value })
+                      }
                     >
-                      Save
-                    </button>
-                    <button
-                      className="btn-cancel"
-                      onClick={() => setEditing(null)}
-                    >
-                      Cancel
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button className="btn-edit" onClick={() => handleEdit(r)}>
-                      ✏️
-                    </button>
-                    <button
-                      className="btn-delete"
-                      onClick={() => handleDelete(r.id)}
-                    >
-                      🗑️
-                    </button>
-                  </>
-                )}
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                    </select>
+                  ) : (
+                    <span className={`status ${r.status}`}>{r.status}</span>
+                  )}
+                </td>
+                <td>
+                  {r.photo ? (
+                    <img
+                      src={`/uploads/${r.photo}`}
+                      alt="reservation"
+                      width="50"
+                    />
+                  ) : (
+                    "No photo"
+                  )}
+                </td>
+                <td className="actions">
+                  {editing === r.id ? (
+                    <>
+                      <button
+                        className="btn-save"
+                        onClick={() => handleUpdate(r.id)}
+                      >
+                        Save
+                      </button>
+                      <button
+                        className="btn-cancel"
+                        onClick={() => setEditing(null)}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        className="btn-edit"
+                        onClick={() => handleEdit(r)}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        className="btn-delete"
+                        onClick={() => handleDelete(r.id)}
+                      >
+                        🗑️
+                      </button>
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="8" style={{ textAlign: "center" }}>
+                No reservations found.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
