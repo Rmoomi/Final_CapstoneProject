@@ -7,11 +7,9 @@ function Feedback() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ Modal state
   const [showModal, setShowModal] = useState(false);
   const [feedbackToDelete, setFeedbackToDelete] = useState(null);
 
-  // ✅ Get logged-in user
   const user = JSON.parse(localStorage.getItem("user"));
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -31,7 +29,7 @@ function Feedback() {
       .catch((err) => console.error("Error fetching feedback:", err));
   }, [API_URL, user]);
 
-  // ✅ Handle feedback submit
+  // ✅ Submit feedback
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!user) {
@@ -74,13 +72,12 @@ function Feedback() {
     setLoading(false);
   };
 
-  // ✅ Show modal
+  // ✅ Delete modal
   const confirmDelete = (feedbackId) => {
     setFeedbackToDelete(feedbackId);
     setShowModal(true);
   };
 
-  // ✅ Handle feedback delete
   const handleDelete = async () => {
     if (!feedbackToDelete) return;
 
@@ -112,7 +109,7 @@ function Feedback() {
       {/* ✅ Feedback Form */}
       {user ? (
         <form className="feedback-form" onSubmit={handleSubmit}>
-          <label>Rate our system:</label>
+          <label>Rate Our Services:</label>
           <div className="star-rating">
             {[1, 2, 3, 4, 5].map((num) => (
               <span
@@ -166,7 +163,15 @@ function Feedback() {
                 </span>
               </div>
 
-              {/* ✅ Delete button only for owner */}
+              {/* ✅ Show admin reply */}
+              {fb.reply && (
+                <div className="admin-reply">
+                  <strong>Admin Reply:</strong>
+                  <p>{fb.reply}</p>
+                </div>
+              )}
+
+              {/* ✅ Delete button */}
               {user && fb.user_id === user.id && (
                 <button
                   className="delete-btn"

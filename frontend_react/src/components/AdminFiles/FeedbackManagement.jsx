@@ -7,10 +7,9 @@ function FeedbackManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Use environment variable or fallback
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-  // ✅ Fetch feedbacks
+  // ✅ Fetch all feedbacks
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -18,7 +17,6 @@ function FeedbackManagement() {
         if (!res.ok) throw new Error(`Failed to fetch feedback: ${res.status}`);
         const data = await res.json();
 
-        // ✅ Ensure always array
         const feedbackArray = Array.isArray(data) ? data : data.feedbacks || [];
         setFeedbacks(feedbackArray);
       } catch (err) {
@@ -46,10 +44,10 @@ function FeedbackManagement() {
 
       const data = await res.json();
 
-      // ✅ Update UI immediately with reply
+      // ✅ Update with reply
       setFeedbacks((prev) =>
         prev.map((fb) =>
-          fb.feedback_id === feedbackId
+          fb.id === feedbackId
             ? { ...fb, reply: data.reply || replyText[feedbackId] }
             : fb
         )
@@ -65,7 +63,6 @@ function FeedbackManagement() {
   if (loading) return <p className="loading">Loading feedback...</p>;
   if (error) return <p className="error">{error}</p>;
 
-  // ✅ Summary counts
   const totalFeedbacks = feedbacks.length;
   const pendingFeedbacks = feedbacks.filter((fb) => !fb.reply).length;
 
@@ -73,7 +70,7 @@ function FeedbackManagement() {
     <div className="feedback-management">
       <h1>User Feedback Management</h1>
 
-      {/* ✅ Summary Card */}
+      {/* ✅ Summary */}
       <div className="summary-cards">
         <div className="summary-card total">
           <h3>Total Feedback</h3>
@@ -89,7 +86,7 @@ function FeedbackManagement() {
         <p className="no-feedback">No feedback found.</p>
       ) : (
         feedbacks.map((fb) => (
-          <div className="feedback-card" key={fb.feedback_id}>
+          <div className="feedback-card" key={fb.id}>
             <div className="feedback-header">
               <h3>
                 {`${fb.firstname || ""} ${fb.lastname || ""}`.trim() ||
@@ -111,17 +108,15 @@ function FeedbackManagement() {
               <div className="reply-box">
                 <textarea
                   placeholder="Write a reply..."
-                  value={replyText[fb.feedback_id] || ""}
+                  value={replyText[fb.id] || ""}
                   onChange={(e) =>
                     setReplyText((prev) => ({
                       ...prev,
-                      [fb.feedback_id]: e.target.value,
+                      [fb.id]: e.target.value,
                     }))
                   }
                 />
-                <button onClick={() => handleReply(fb.feedback_id)}>
-                  Send Reply
-                </button>
+                <button onClick={() => handleReply(fb.id)}>Send Reply</button>
               </div>
             )}
           </div>
