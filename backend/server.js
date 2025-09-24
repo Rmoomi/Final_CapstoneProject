@@ -8,7 +8,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-// ✅ API routes (prefix with /api)
+// ✅ API routes (all inside /api prefix)
 app.use("/api", routes);
 
 // Start server

@@ -10,7 +10,7 @@ import UserManagement from "./components/AdminFiles/UserManagement.jsx";
 import Dashboard from "./components/AdminFiles/Dashboard.jsx"; // placeholder for admin home
 
 import Reservation from "./components/Reservation.jsx";
-import About from "./components/About.jsx";
+import DigitalMap from "./components/DigitalMap.jsx";
 import Notifications from "./components/Notifications.jsx";
 import Feedback from "./components/Feedback.jsx";
 import NavLayout from "./components/NavLayout.jsx";
@@ -34,7 +34,7 @@ function App() {
         <Route element={<NavLayout />}>
           <Route path="/homepage" element={<Homepage />} />
           <Route path="/reservation" element={<Reservation />} />
-          <Route path="/about" element={<About />} />
+          <Route path="/digitalmap" element={<DigitalMap />} />
           <Route path="/notifications" element={<Notifications />} />
           <Route path="/feedback" element={<Feedback />} />
         </Route>

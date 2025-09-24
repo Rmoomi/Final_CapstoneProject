@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const multer = require("multer");
-const path = require("path"); // ✅ Add this
+const path = require("path");
 const connectDB = require("./db");
 
 const router = express.Router();
@@ -210,7 +210,7 @@ router.delete("/users/:id", (req, res) => {
   });
 });
 
-//SUBMIT RESERVATION TO DATABASE
+// ⬇️ Multer for file uploads (Reservation)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, path.join(__dirname, "uploads")); // save in backend/uploads
@@ -254,8 +254,8 @@ router.post("/reservation", upload.single("photo"), (req, res) => {
     });
   });
 });
-// Fetch all reservations
-// Fetch all reservations
+
+// ✅ Fetch all reservations
 router.get("/reservations", (req, res) => {
   const sql = "SELECT * FROM reservations ORDER BY id DESC";
   connectDB.query(sql, (err, results) => {
@@ -269,7 +269,7 @@ router.get("/reservations", (req, res) => {
   });
 });
 
-// Update reservation (edit details or update status)
+// ✅ Update reservation
 router.put("/reservations/:id", (req, res) => {
   const { cemetery, fullname, contact, date, status } = req.body;
   const { id } = req.params;
@@ -292,7 +292,7 @@ router.put("/reservations/:id", (req, res) => {
   });
 });
 
-// Delete reservation
+// ✅ Delete reservation
 router.delete("/reservations/:id", (req, res) => {
   const { id } = req.params;
   const sql = "DELETE FROM reservations WHERE id=?";
@@ -305,6 +305,66 @@ router.delete("/reservations/:id", (req, res) => {
     }
     res.json({ success: true, message: "Reservation deleted successfully!" });
   });
+});
+
+/**
+ * ✅ INSERT FEEDBACK
+ */
+router.post("/feedback", (req, res) => {
+  const { user_id, rating, message } = req.body;
+
+  if (!user_id || !rating || !message) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required." });
+  }
+
+  const sql = `
+    INSERT INTO feedback (user_id, rating, message, status, created_at, updated_at)
+    VALUES (?, ?, ?, 'pending', NOW(), NOW())
+  `;
+  const values = [user_id, rating, message];
+
+  connectDB.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Error inserting feedback:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error." });
+    }
+
+    res.json({
+      success: true,
+      message: "Feedback submitted successfully!",
+      feedback: {
+        id: result.insertId,
+        user_id,
+        rating,
+        message,
+        status: "pending",
+        created_at: new Date(),
+      },
+    });
+  });
+});
+
+/**
+ * ✅ GET feedback for a specific user
+ */
+router.get("/feedback", (req, res) => {
+  const { user_id } = req.query;
+  if (!user_id)
+    return res.json({ success: false, message: "User ID required" });
+
+  connectDB.query(
+    "SELECT * FROM feedback WHERE user_id = ? ORDER BY created_at DESC",
+    [user_id],
+    (err, results) => {
+      if (err)
+        return res.status(500).json({ success: false, message: "DB error" });
+      res.json({ success: true, feedbacks: results });
+    }
+  );
 });
 
 module.exports = router;

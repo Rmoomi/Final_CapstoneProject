@@ -51,7 +51,7 @@ function NavLayout() {
             <Link to="/homepage">Home</Link>
           </li>
           <li>
-            <Link to="/map">Digital Cemetery Map</Link>
+            <Link to="/digitalmap">Digital Cemetery Map</Link>
           </li>
           <li>
             <Link to="/reservation">Reservations</Link>
@@ -102,7 +102,7 @@ function NavLayout() {
               </Link>
             </li>
             <li>
-              <Link to="/map" onClick={closeMenu}>
+              <Link to="/digitalmap" onClick={closeMenu}>
                 Digital Cemetery Map
               </Link>
             </li>
