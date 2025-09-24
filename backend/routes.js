@@ -321,7 +321,7 @@ router.post("/feedback", (req, res) => {
 
   const sql = `
     INSERT INTO feedback (user_id, rating, message, status, created_at, updated_at)
-    VALUES (?, ?, ?, 'pending', NOW(), NOW())
+    VALUES (?, ?, ?, 'delivered', NOW(), NOW())
   `;
   const values = [user_id, rating, message];
 
@@ -341,7 +341,7 @@ router.post("/feedback", (req, res) => {
         user_id,
         rating,
         message,
-        status: "pending",
+        status: "delivered",
         created_at: new Date(),
       },
     });
@@ -349,22 +349,99 @@ router.post("/feedback", (req, res) => {
 });
 
 /**
- * ✅ GET feedback for a specific user
+ * ✅ GET feedback
  */
 router.get("/feedback", (req, res) => {
   const { user_id } = req.query;
-  if (!user_id)
-    return res.json({ success: false, message: "User ID required" });
 
-  connectDB.query(
-    "SELECT * FROM feedback WHERE user_id = ? ORDER BY created_at DESC",
-    [user_id],
-    (err, results) => {
-      if (err)
-        return res.status(500).json({ success: false, message: "DB error" });
-      res.json({ success: true, feedbacks: results });
+  let sql = `
+    SELECT f.*, u.firstname, u.lastname
+    FROM feedback f
+    JOIN useraccount u ON f.user_id = u.user_id
+    ORDER BY f.created_at DESC
+  `;
+  let params = [];
+
+  if (user_id) {
+    sql = `
+      SELECT f.*, u.firstname, u.lastname
+      FROM feedback f
+      JOIN useraccount u ON f.user_id = u.user_id
+      WHERE f.user_id = ?
+      ORDER BY f.created_at DESC
+    `;
+    params = [user_id];
+  }
+
+  connectDB.query(sql, params, (err, results) => {
+    if (err) {
+      console.error("Error fetching feedback:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error" });
     }
-  );
+
+    res.json({ success: true, feedbacks: results });
+  });
+});
+
+/**
+ * ✅ ADMIN REPLY TO FEEDBACK
+ */
+router.post("/feedback/:id/reply", (req, res) => {
+  const { id } = req.params;
+  const { reply } = req.body;
+
+  if (!reply) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Reply is required" });
+  }
+
+  const sql = `
+    UPDATE feedback
+    SET reply=?, status='replied', updated_at=NOW()
+    WHERE id=?
+  `;
+
+  connectDB.query(sql, [reply, id], (err) => {
+    if (err) {
+      console.error("Error updating feedback reply:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error" });
+    }
+    res.json({ success: true, message: "Reply saved successfully", reply });
+  });
+});
+
+// ✅ DELETE feedback
+router.delete("/feedback/:id", (req, res) => {
+  const { id } = req.params;
+
+  if (!id) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Feedback ID is required." });
+  }
+
+  const sql = "DELETE FROM feedback WHERE id = ?";
+  connectDB.query(sql, [id], (err, result) => {
+    if (err) {
+      console.error("Error deleting feedback:", err.sqlMessage || err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error." });
+    }
+
+    if (result.affectedRows === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Feedback not found." });
+    }
+
+    res.json({ success: true, message: "Feedback deleted successfully!" });
+  });
 });
 
 module.exports = router;

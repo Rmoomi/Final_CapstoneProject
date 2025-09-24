@@ -7,14 +7,18 @@ function Feedback() {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ Get logged-in user (adjust if you use JWT or sessions)
+  // ✅ Modal state
+  const [showModal, setShowModal] = useState(false);
+  const [feedbackToDelete, setFeedbackToDelete] = useState(null);
+
+  // ✅ Get logged-in user
   const user = JSON.parse(localStorage.getItem("user"));
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
   // ✅ Fetch feedbacks for this user only
   useEffect(() => {
     if (!user) {
-      setFeedbacks([]); // clear when logged out
+      setFeedbacks([]);
       return;
     }
 
@@ -56,7 +60,7 @@ function Feedback() {
       const data = await res.json();
 
       if (data.success) {
-        setFeedbacks([data.feedback, ...feedbacks]); // prepend new feedback
+        setFeedbacks([data.feedback, ...feedbacks]);
         setRating(0);
         setMessage("");
       } else {
@@ -68,6 +72,37 @@ function Feedback() {
     }
 
     setLoading(false);
+  };
+
+  // ✅ Show modal
+  const confirmDelete = (feedbackId) => {
+    setFeedbackToDelete(feedbackId);
+    setShowModal(true);
+  };
+
+  // ✅ Handle feedback delete
+  const handleDelete = async () => {
+    if (!feedbackToDelete) return;
+
+    try {
+      const res = await fetch(`${API_URL}/api/feedback/${feedbackToDelete}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) throw new Error(`Server error: ${res.status}`);
+      const data = await res.json();
+
+      if (data.success) {
+        setFeedbacks((prev) => prev.filter((fb) => fb.id !== feedbackToDelete));
+        setShowModal(false);
+        setFeedbackToDelete(null);
+      } else {
+        alert(data.message || "Failed to delete feedback");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Something went wrong while deleting.");
+    }
   };
 
   return (
@@ -117,7 +152,7 @@ function Feedback() {
                 </span>
                 <span
                   className={`feedback-status ${
-                    fb.status === "approved" ? "approved" : "pending"
+                    fb.status === "approved" ? "approved" : "delivered"
                   }`}
                 >
                   {fb.status}
@@ -130,8 +165,39 @@ function Feedback() {
                   {new Date(fb.created_at).toLocaleDateString()}
                 </span>
               </div>
+
+              {/* ✅ Delete button only for owner */}
+              {user && fb.user_id === user.id && (
+                <button
+                  className="delete-btn"
+                  onClick={() => confirmDelete(fb.id)}
+                >
+                  Delete
+                </button>
+              )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ✅ Confirmation Modal */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this feedback?</p>
+            <div className="modal-actions">
+              <button
+                className="cancel-btn"
+                onClick={() => setShowModal(false)}
+              >
+                Cancel
+              </button>
+              <button className="confirm-btn" onClick={handleDelete}>
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
