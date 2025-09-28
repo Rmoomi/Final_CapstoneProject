@@ -1,0 +1,44 @@
+
+.notification-container {
+    max-width: 600px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+} 
+
+.notification {
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    border-left: 4px solid transparent;
+    transition: transform 0.2s;
+}
+
+.notification.unread {
+    border-left-color: blue;
+}
+
+.notification.read {
+    border-left-color: gray;
+}
+
+.notification h4 {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.notification p {
+    margin: 8px 0;
+}
+
+.notification small {
+    display: block;
+    color: gray;
+    font-size: 0.8em;
+    text-align: right;
+}
+
+.notification:hover {
+    transform: translateY(-2px);
+}

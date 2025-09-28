@@ -55,6 +55,9 @@ router.post("/register", async (req, res) => {
 /**
  * ✅ LOGIN user
  */
+/**
+ * ✅ LOGIN user
+ */
 router.post("/login", (req, res) => {
   const { email, pass } = req.body;
 
@@ -87,6 +90,7 @@ router.post("/login", (req, res) => {
         });
       }
 
+      // ✅ Save user_id in response
       res.json({
         success: true,
         message: "Login successful",
@@ -441,6 +445,96 @@ router.delete("/feedback/:id", (req, res) => {
     }
 
     res.json({ success: true, message: "Feedback deleted successfully!" });
+  });
+});
+// Prompt for Copilot:
+// In Express route.js, create notification routes.
+// 1. POST /api/notifications → to create a new notification (fields: user_id, title, message, status, date).
+// 2. GET /api/notifications/:userId → to fetch all notifications for a specific user.
+// 3. PATCH /api/notifications/:id/read → to mark a notification as read.
+// Export the router and connect it to server.js with app.use("/api", routes).
+/** * ✅ CREATE notification
+ */
+// POST notification
+router.post("/notifications", (req, res) => {
+  const { user_id, title, message } = req.body;
+
+  if (!user_id || !title || !message) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required." });
+  }
+
+  const sql = `
+    INSERT INTO notifications (user_id, title, message, status, date)
+    VALUES (?, ?, ?, 'unread', NOW())
+  `;
+  const values = [user_id, title, message];
+
+  connectDB.query(sql, values, (err, result) => {
+    if (err) {
+      console.error("Error inserting notification:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error." });
+    }
+
+    res.json({
+      success: true,
+      message: "Notification created successfully!",
+      notification: {
+        id: result.insertId,
+        user_id,
+        title,
+        message,
+        status: "unread",
+        date: new Date(),
+      },
+    });
+  });
+});
+
+// GET notifications by user
+router.get("/notifications/:userId", (req, res) => {
+  const { userId } = req.params;
+
+  const sql = `
+    SELECT * FROM notifications
+    WHERE user_id = ?
+    ORDER BY date DESC
+  `;
+
+  connectDB.query(sql, [userId], (err, results) => {
+    if (err) {
+      console.error("Error fetching notifications:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error." });
+    }
+
+    res.json({ success: true, notifications: results });
+  });
+});
+
+// PATCH mark as read
+router.patch("/notifications/:id/read", (req, res) => {
+  const { id } = req.params;
+
+  const sql = `
+    UPDATE notifications
+    SET status = 'read'
+    WHERE id = ?
+  `;
+
+  connectDB.query(sql, [id], (err) => {
+    if (err) {
+      console.error("Error updating notification:", err);
+      return res
+        .status(500)
+        .json({ success: false, message: "Database error." });
+    }
+
+    res.json({ success: true, message: "Notification marked as read." });
   });
 });
 
