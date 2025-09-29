@@ -35,6 +35,16 @@ body {
   padding: 20px; /* for mobile spacing */
 }
 
+/* Admin Login */
+.to_admin_login {
+  position: absolute;
+  top: 24px;
+  right: 32px;
+  cursor: pointer;
+  width: 20px;
+  margin-bottom: 16px;
+}
+
 .login-box {
   display: flex;
   flex-direction: column;

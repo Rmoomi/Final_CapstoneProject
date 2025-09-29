@@ -14,6 +14,6 @@ router.use("/users", userRoutes);
 router.use("/reservations", reservationRoutes);
 router.use("/feedback", feedbackRoutes);
 router.use("/notifications", notificationRoutes);
-router.use("/admin", adminAuthRoutes);
+router.use("/admin", adminAuthRoutes); // ✅ remove extra "api"
 
 module.exports = router;

@@ -1,6 +1,7 @@
 import "./css/Login.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import adminIcon from "../assets/admin_icon.png";
 
 function Login() {
   const navigate = useNavigate();
@@ -64,6 +65,13 @@ function Login() {
       </div>
 
       <main className="login-container">
+        <img
+          src={adminIcon}
+          alt="Admin Login"
+          className="to_admin_login"
+          style={{ cursor: "pointer", width: "40px", marginBottom: "16px" }}
+          onClick={() => navigate("/admin/login")}
+        />
         <div className="login-box">
           <h2>Welcome To Everest Portal</h2>
           <p className="subtitle">Sign in to access your account</p>

@@ -16,15 +16,21 @@ const upload = multer({ storage });
 router.post("/", upload.single("photo"), (req, res) => {
   const { cemetery, fullname, contact, date, user_id } = req.body;
   const photo = req.file ? req.file.filename : null;
-  const sql = `INSERT INTO reservations (cemetery, fullname, contact, date, photo, user_id) VALUES (?, ?, ?, ?, ?, ?)`;
+
+  const sql = `INSERT INTO reservations 
+    (cemetery, fullname, contact, date, photo, user_id, status) 
+    VALUES (?, ?, ?, ?, ?, ?, 'pending')`;
+
   connectDB.query(
     sql,
     [cemetery, fullname, contact, date, photo, user_id],
     (err, result) => {
-      if (err)
+      if (err) {
+        console.error("DB Error:", err);
         return res
           .status(500)
           .json({ success: false, message: "Database error" });
+      }
       res.json({
         success: true,
         message: "Reservation saved",
@@ -37,12 +43,14 @@ router.post("/", upload.single("photo"), (req, res) => {
 // READ all reservations
 router.get("/", (req, res) => {
   connectDB.query(
-    "SELECT * FROM reservations ORDER BY id DESC",
+    "SELECT id, cemetery, fullname, contact, date, photo, user_id, status FROM reservations ORDER BY id DESC",
     (err, results) => {
-      if (err)
+      if (err) {
+        console.error("DB Error:", err);
         return res
           .status(500)
           .json({ success: false, message: "Database error" });
+      }
       res.json({ success: true, reservations: results });
     }
   );
@@ -51,15 +59,20 @@ router.get("/", (req, res) => {
 // UPDATE reservation
 router.put("/:id", (req, res) => {
   const { cemetery, fullname, contact, date, status } = req.body;
-  const sql = `UPDATE reservations SET cemetery=?, fullname=?, contact=?, date=?, status=? WHERE id=?`;
+  const sql = `UPDATE reservations 
+    SET cemetery=?, fullname=?, contact=?, date=?, status=? 
+    WHERE id=?`;
+
   connectDB.query(
     sql,
     [cemetery, fullname, contact, date, status, req.params.id],
     (err) => {
-      if (err)
+      if (err) {
+        console.error("DB Error:", err);
         return res
           .status(500)
           .json({ success: false, message: "Database error" });
+      }
       res.json({ success: true, message: "Reservation updated" });
     }
   );
@@ -71,10 +84,12 @@ router.delete("/:id", (req, res) => {
     "DELETE FROM reservations WHERE id=?",
     [req.params.id],
     (err) => {
-      if (err)
+      if (err) {
+        console.error("DB Error:", err);
         return res
           .status(500)
           .json({ success: false, message: "Database error" });
+      }
       res.json({ success: true, message: "Reservation deleted" });
     }
   );

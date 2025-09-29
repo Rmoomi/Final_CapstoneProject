@@ -20,9 +20,10 @@ router.post("/register", async (req, res) => {
 
   try {
     // ✅ Check if email already exists
-    const [check] = await pool.query("SELECT * FROM admin WHERE email = ?", [
-      email,
-    ]);
+    const [check] = await pool.query(
+      "SELECT * FROM admin_accounts WHERE email = ?",
+      [email]
+    );
     if (check.length > 0) {
       return res
         .status(400)
@@ -34,7 +35,7 @@ router.post("/register", async (req, res) => {
 
     // ✅ Insert into DB
     const [result] = await pool.query(
-      "INSERT INTO admin (cemetery_name, fullname, email, password_hash, created_at) VALUES (?, ?, ?, ?, NOW())",
+      "INSERT INTO admin_accounts (cemetery_name, fullname, email, password_hash, created_at) VALUES (?, ?, ?, ?, NOW())",
       [cemetery_name, fullname, email, hashedPassword]
     );
 
@@ -66,9 +67,10 @@ router.post("/login", async (req, res) => {
 
   try {
     // ✅ Check if admin exists
-    const [rows] = await pool.query("SELECT * FROM admin WHERE email = ?", [
-      email,
-    ]);
+    const [rows] = await pool.query(
+      "SELECT * FROM admin_accounts WHERE email = ?",
+      [email]
+    );
     if (rows.length === 0) {
       return res
         .status(400)
