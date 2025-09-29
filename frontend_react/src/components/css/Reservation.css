@@ -124,17 +124,53 @@
   color: red;
 }
 
-/*responsive design */
+/* make it overall responsive */
 @media (max-width: 768px) {
   .reservation-layout {
     flex-direction: column;
     gap: 20px;
-    margin: 80px 15px;
-    padding: 15px;
+    margin: 40px 8px;
+    padding: 8px;
+    width: 100%;
+    max-width: 100%;
   }
 
+  .reservation-form-container,
   .reservation-card-container {
-    max-height: 400px; /* smaller height for mobile */
+    margin-left: 0;
+    padding: 12px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(44, 62, 80, 0.12);
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .reservation-form-container h2,
+  .reservation-card-container h3 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  .reservation-form input,
+  .reservation-form select {
+    font-size: 0.95rem;
+    padding: 8px;
+  }
+
+  .reservation-list {
+    max-height: 250px;
+    padding-right: 4px;
+  }
+
+  .reservation-card {
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+  }
+
+  .reservation-card img {
+    max-height: 120px;
+    margin-top: 6px;
   }
 
   .submit-btn {
