@@ -42,8 +42,9 @@ function Reservation() {
       data.append("date", formData.date);
       data.append("photo", formData.photo);
       data.append("user_id", formData.user_id); // ✅ send user_id
+      const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-      const res = await fetch("http://localhost:8080/api/reservation", {
+      const res = await fetch(`${API_URL}/api/reservation`, {
         method: "POST",
         body: data,
       });

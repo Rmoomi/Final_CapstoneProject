@@ -17,6 +17,25 @@ function ReservationManagement() {
     status: "pending",
   });
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All Status");
+
+  // ✅ Photo modal state
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+
+  useEffect(() => {
+    fetchReservations();
+  }, []);
+
+  const fetchReservations = async () => {
+    try {
+      const res = await axios.get("http://localhost:8080/api/reservations");
+      if (res.data.success) setReservations(res.data.reservations);
+    } catch (err) {
+      console.error("Error fetching reservations:", err);
+    }
+  };
+
   // ✅ Approve reservation and send notification
   async function handleApproveReservation(reservation) {
     try {
@@ -45,23 +64,6 @@ function ReservationManagement() {
       alert("Failed to approve reservation. Please try again.");
     }
   }
-
-  // ✅ New states for search & filter
-  const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All Status");
-
-  useEffect(() => {
-    fetchReservations();
-  }, []);
-
-  const fetchReservations = async () => {
-    try {
-      const res = await axios.get("http://localhost:8080/api/reservations");
-      if (res.data.success) setReservations(res.data.reservations);
-    } catch (err) {
-      console.error("Error fetching reservations:", err);
-    }
-  };
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this reservation?"))
@@ -231,7 +233,20 @@ function ReservationManagement() {
                         <option value="approved">Approved</option>
                       </select>
                     </td>
-                    <td>{r.photo ? "Has photo" : "No photo"}</td>
+                    <td>
+                      {r.photo ? (
+                        <button
+                          className="btn-view-photo"
+                          onClick={() =>
+                            setSelectedPhoto(`/uploads/${r.photo}`)
+                          }
+                        >
+                          View Photo
+                        </button>
+                      ) : (
+                        "No photo"
+                      )}
+                    </td>
                     <td>
                       <button
                         className="btn-save"
@@ -259,17 +274,19 @@ function ReservationManagement() {
                     </td>
                     <td>
                       {r.photo ? (
-                        <img
-                          src={`/uploads/${r.photo}`}
-                          alt="reservation"
-                          width="50"
-                        />
+                        <button
+                          className="btn-view-photo"
+                          onClick={() =>
+                            setSelectedPhoto(`/uploads/${r.photo}`)
+                          }
+                        >
+                          View Photo
+                        </button>
                       ) : (
                         "No photo"
                       )}
                     </td>
                     <td className="actions">
-                      {/* ✅ Show approve button ONLY if still pending */}
                       {r.status === "pending" && (
                         <button
                           className="btn-approve"
@@ -279,7 +296,6 @@ function ReservationManagement() {
                         </button>
                       )}
 
-                      {/* Edit + Delete are always visible */}
                       <button
                         className="btn-edit"
                         onClick={() => handleEdit(r)}
@@ -311,6 +327,24 @@ function ReservationManagement() {
           )}
         </tbody>
       </table>
+
+      {/* ✅ Modal for viewing photo */}
+      {selectedPhoto && (
+        <div className="photo-modal" onClick={() => setSelectedPhoto(null)}>
+          <div
+            className="photo-modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img src={selectedPhoto} alt="reservation full" />
+            <button
+              className="btn-close"
+              onClick={() => setSelectedPhoto(null)}
+            >
+              ✖ Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

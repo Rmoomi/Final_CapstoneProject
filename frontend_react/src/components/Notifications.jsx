@@ -3,19 +3,27 @@ import "./css/Notifications.css";
 
 function Notifications() {
   const [notifications, setNotifications] = useState([]);
+  const [shownIds, setShownIds] = useState([]); // ✅ track already shown push notifications
+
+  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+
+  // ✅ Request browser notification permission
+  useEffect(() => {
+    if ("Notification" in window && Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+  }, []);
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        // ✅ Try both string and JSON storage
+        // ✅ Get user_id
         let userId = localStorage.getItem("user_id");
-
-        // If not stored directly, maybe saved under "user" object
         if (!userId) {
           const userData = localStorage.getItem("user");
           if (userData) {
             const parsed = JSON.parse(userData);
-            userId = parsed.id; // match backend `user.id`
+            userId = parsed.id;
           }
         }
 
@@ -24,14 +32,30 @@ function Notifications() {
           return;
         }
 
-        const response = await fetch(
-          `http://localhost:8080/api/notifications/${userId}`
-        );
+        const response = await fetch(`${API_URL}/api/notifications/${userId}`);
         if (!response.ok) throw new Error("Failed to fetch notifications");
 
         const data = await response.json();
         if (data.success) {
           setNotifications(data.notifications);
+
+          // ✅ Only show *new unread* notifications that haven’t been shown before
+          data.notifications
+            .filter((n) => n.status === "unread" && !shownIds.includes(n.id))
+            .forEach((n) => {
+              if (
+                "Notification" in window &&
+                Notification.permission === "granted"
+              ) {
+                new Notification(n.title, {
+                  body: n.message,
+                  icon: "/notification-icon.png", // optional icon
+                });
+
+                // ✅ Mark this notification as shown (so it won’t repeat)
+                setShownIds((prev) => [...prev, n.id]);
+              }
+            });
         } else {
           console.error("No notifications found:", data.message);
         }
@@ -40,16 +64,18 @@ function Notifications() {
       }
     };
 
+    // ✅ Poll every 10s for new notifications
     fetchNotifications();
-  }, []);
+    const interval = setInterval(fetchNotifications, 10000);
+    return () => clearInterval(interval);
+  }, [API_URL, shownIds]); // include shownIds so it updates properly
 
   // ✅ Mark as read
   const markAsRead = async (id) => {
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/notifications/${id}/read`,
-        { method: "PATCH" }
-      );
+      const response = await fetch(`${API_URL}/api/notifications/${id}/read`, {
+        method: "PATCH",
+      });
       const data = await response.json();
       if (data.success) {
         setNotifications((prev) =>

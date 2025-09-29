@@ -1,5 +1,5 @@
 .feedback-container {
-  width: 700px; /* wider container */
+  width: 780px; /* wider container */
   margin: 80px auto 40px; /* push content lower from navbar */
   padding: 25px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -251,5 +251,31 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+/* responsive design */
+@media (max-width: 600px) {
+  .feedback-container {
+    width: 90%;
+    margin: 60px auto 30px;
+    padding: 15px;
+  }
+
+  .feedback-form,
+  .feedback-card {
+    padding: 15px;
+  }
+
+  .feedback-form textarea {
+    min-height: 80px;
+  }
+
+  .star-rating {
+    font-size: 1.5rem; /* slightly smaller stars on mobile */
+  }
+
+  .modal {
+    width: 90%;
+    padding: 20px;
   }
 }

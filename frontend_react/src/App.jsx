@@ -14,6 +14,9 @@ import DigitalMap from "./components/DigitalMap.jsx";
 import Notifications from "./components/Notifications.jsx";
 import Feedback from "./components/Feedback.jsx";
 import NavLayout from "./components/NavLayout.jsx";
+import AdminRegister from "./components/AdminFiles/AdminRegister.jsx";
+import AdminLogin from "./components/AdminFiles/AdminLogin.jsx";
+
 function App() {
   return (
     <BrowserRouter>
@@ -22,6 +25,9 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/register" element={<RegisterAcc />} />
         <Route path="/login" element={<Login />} />
+
+        <Route path="/admin/register" element={<AdminRegister />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
 
         {/* Admin layout with nested routes */}
         <Route path="/admin" element={<Admin />}>

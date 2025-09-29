@@ -8,7 +8,7 @@ function Admin() {
 
   const handleLogout = () => {
     localStorage.removeItem("admin"); // or "user", depending on your storage key
-    navigate("/"); // redirect to login page
+    navigate("/admin/login"); // redirect to login page
   };
 
   return (

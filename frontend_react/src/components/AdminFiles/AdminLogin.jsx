@@ -1,57 +1,53 @@
-import "./css/Login.css";
+import "../admin_css/AdminAcc.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-function Login() {
+function AdminLogin() {
   const navigate = useNavigate();
   const [showError, setShowError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [displayInput, setInput] = useState({
+  const [formData, setFormData] = useState({
     email: "",
     pass: "",
   });
 
-  // ✅ Use backend URL (set in .env or fallback to localhost:8080)
   const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
   const handleLogin = async () => {
-    setLoading(true); // ✅ start loading
+    setLoading(true);
     try {
-      const res = await fetch(`${API_URL}/api/auth/login`, {
+      const res = await fetch(`${API_URL}/api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(displayInput),
+        body: JSON.stringify(formData),
       });
 
       const data = await res.json();
-      console.log("Server says:", data);
+      console.log("Admin login response:", data);
 
       if (res.ok && data.success) {
-        // ✅ Save user info
-        localStorage.setItem("user", JSON.stringify(data.user));
-
-        // ✅ Redirect
-        navigate("/homepage");
+        localStorage.setItem("admin", JSON.stringify(data.admin));
+        navigate("/admin"); // ✅ redirect to admin dashboard
       } else {
-        showErrorMessage();
+        showErrorMessage("Invalid email or password!");
       }
     } catch (err) {
       console.error("Error logging in:", err);
-      showErrorMessage();
+      showErrorMessage("Something went wrong!");
     } finally {
-      setLoading(false); // ✅ stop loading
+      setLoading(false);
     }
   };
 
-  const showErrorMessage = () => {
-    setShowError(true);
+  const showErrorMessage = (msg) => {
+    setShowError(msg);
     setTimeout(() => setShowError(false), 3000);
   };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setInput((prevData) => ({
-      ...prevData,
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
     }));
   };
@@ -59,14 +55,12 @@ function Login() {
   return (
     <>
       {/* ✅ Error Pop-up */}
-      <div className={`popup ${showError ? "show" : ""}`}>
-        INVALID USERNAME OR PASSWORD
-      </div>
+      <div className={`popup ${showError ? "show" : ""}`}>{showError}</div>
 
       <main className="login-container">
         <div className="login-box">
-          <h2>Welcome To Everest Portal</h2>
-          <p className="subtitle">Sign in to access your account</p>
+          <h2>Admin Login</h2>
+          <p className="subtitle">Sign in to manage the cemetery system</p>
 
           <form
             onSubmit={(e) => {
@@ -78,7 +72,7 @@ function Login() {
             <input
               type="email"
               name="email"
-              value={displayInput.email}
+              value={formData.email}
               placeholder="Enter your email"
               onChange={handleChange}
               required
@@ -88,7 +82,7 @@ function Login() {
             <input
               type="password"
               name="pass"
-              value={displayInput.pass}
+              value={formData.pass}
               placeholder="Enter your password"
               onChange={handleChange}
               required
@@ -101,7 +95,7 @@ function Login() {
 
           <p className="signup-link">
             Don’t have an account?
-            <a onClick={() => navigate("/register")}> Sign up</a>
+            <a onClick={() => navigate("/admin/register")}> Sign up</a>
           </p>
         </div>
       </main>
@@ -109,4 +103,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default AdminLogin;

@@ -1,0 +1,150 @@
+/* ===== Container ===== */
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #ffffff;
+  padding: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ===== Login/Register Box ===== */
+.login-box {
+  background: #ffffff;
+  padding: 30px 25px;
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+  width: 780px;
+  max-width: 420px;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.login-box:hover {
+  transform: translateY(-2px);
+}
+
+.login-box h2 {
+  margin-bottom: 10px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #718096;
+  margin-bottom: 20px;
+}
+
+/* ===== Labels & Inputs ===== */
+form {
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 18px;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s ease;
+}
+
+input:focus {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
+}
+
+/* ===== Button ===== */
+.btn-blue {
+  width: 100%;
+  background: #3182ce;
+  color: #fff;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-blue:hover {
+  background: #2b6cb0;
+}
+
+.btn-blue:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+}
+
+/* ===== Links ===== */
+.signup-link {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+.signup-link a {
+  margin-left: 5px;
+  color: #3182ce;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.signup-link a:hover {
+  text-decoration: underline;
+}
+
+/* ===== Error Popup ===== */
+.popup {
+  position: fixed;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e53e3e;
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transition: all 0.4s ease-in-out;
+  z-index: 9999;
+}
+
+.popup.show {
+  top: 20px;
+  opacity: 1;
+}
+/* update the css for drop down on the admin register */
+/* update the css for drop down on the admin register */
+select {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 18px;
+  border: 1px solid #cbd5e0;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s ease;
+}
+
+select:focus {
+  border-color: #3182ce;
+  box-shadow: 0 0 0 2px rgba(49, 130, 206, 0.2);
+}
