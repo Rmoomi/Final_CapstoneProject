@@ -40,8 +40,27 @@ router.post("/", upload.single("photo"), (req, res) => {
   );
 });
 
-// READ all reservations
+// READ reservations (optionally filter by user_id)
 router.get("/", (req, res) => {
+  const { user_id: userId } = req.query;
+
+  if (userId) {
+    connectDB.query(
+      "SELECT id, cemetery, fullname, contact, date, photo, user_id, status FROM reservations WHERE user_id = ? ORDER BY id DESC",
+      [userId],
+      (err, results) => {
+        if (err) {
+          console.error("DB Error:", err);
+          return res
+            .status(500)
+            .json({ success: false, message: "Database error" });
+        }
+        return res.json({ success: true, reservations: results });
+      }
+    );
+    return;
+  }
+
   connectDB.query(
     "SELECT id, cemetery, fullname, contact, date, photo, user_id, status FROM reservations ORDER BY id DESC",
     (err, results) => {

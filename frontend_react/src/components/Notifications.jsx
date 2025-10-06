@@ -5,7 +5,9 @@ function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [shownIds, setShownIds] = useState([]); // ✅ track already shown push notifications
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+  const API_URL = (import.meta.env.VITE_API_URL || window.__API_URL__ || "http://localhost:8080")
+    .trim()
+    .replace(/\/$/, "");
 
   // ✅ Request browser notification permission
   useEffect(() => {
@@ -32,7 +34,9 @@ function Notifications() {
           return;
         }
 
-        const response = await fetch(`${API_URL}/api/notifications/${userId}`);
+        const response = await fetch(`${API_URL}/api/notifications/${userId}`, {
+          credentials: "include",
+        });
         if (!response.ok) throw new Error("Failed to fetch notifications");
 
         const data = await response.json();
@@ -75,6 +79,7 @@ function Notifications() {
     try {
       const response = await fetch(`${API_URL}/api/notifications/${id}/read`, {
         method: "PATCH",
+        credentials: "include",
       });
       const data = await response.json();
       if (data.success) {
