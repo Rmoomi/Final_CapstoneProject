@@ -14,7 +14,9 @@ function Reservation() {
   const [loading, setLoading] = useState(false);
   const [reservations, setReservations] = useState([]); // ✅ store all reservations
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+  const API_URL = (import.meta.env.VITE_API_URL || window.__API_URL__ || "http://localhost:8080")
+    .trim()
+    .replace(/\/$/, "");
 
   // ✅ Load logged-in user from localStorage
   useEffect(() => {
@@ -28,16 +30,14 @@ function Reservation() {
   // ✅ Fetch ALL reservations for this user
   const fetchReservations = async (userId) => {
     try {
-      const res = await fetch(`${API_URL}/api/reservations`);
+      const url = `${API_URL}/api/reservations?user_id=${encodeURIComponent(userId)}`;
+      const res = await fetch(url, { credentials: "include" });
       const result = await res.json();
 
       if (result.success && result.reservations) {
-        const userReservations = result.reservations.filter(
-          (r) => String(r.user_id) === String(userId)
-        );
-
-        userReservations.sort((a, b) => new Date(b.date) - new Date(a.date));
-        setReservations(userReservations);
+        const items = Array.isArray(result.reservations) ? result.reservations : [];
+        items.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setReservations(items);
       }
     } catch (err) {
       console.error("Error fetching reservations:", err);
@@ -69,6 +69,7 @@ function Reservation() {
       const res = await fetch(`${API_URL}/api/reservations`, {
         method: "POST",
         body: data,
+        credentials: "include",
       });
 
       const result = await res.json();
