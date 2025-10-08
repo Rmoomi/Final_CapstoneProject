@@ -1,3 +1,4 @@
+// backend/routes/feedback.js
 const express = require("express");
 const connectDB = require("../db");
 
@@ -6,16 +7,33 @@ const router = express.Router();
 // CREATE feedback
 router.post("/", (req, res) => {
   const { user_id, rating, message } = req.body;
-  const sql = `INSERT INTO feedback (user_id, rating, message, status, created_at, updated_at) VALUES (?, ?, ?, 'delivered', NOW(), NOW())`;
+  if (!user_id || !rating || !message) {
+    return res
+      .status(400)
+      .json({ success: false, message: "All fields are required" });
+  }
+
+  const sql = `
+    INSERT INTO feedback (user_id, rating, message, status, created_at, updated_at)
+    VALUES (?, ?, ?, 'delivered', NOW(), NOW())
+  `;
   connectDB.query(sql, [user_id, rating, message], (err, result) => {
-    if (err)
+    if (err) {
+      console.error("DB error:", err);
       return res
         .status(500)
         .json({ success: false, message: "Database error" });
+    }
     res.json({
       success: true,
       message: "Feedback submitted",
-      feedback: { id: result.insertId, user_id, rating, message },
+      feedback: {
+        id: result.insertId,
+        user_id,
+        rating,
+        message,
+        status: "delivered",
+      },
     });
   });
 });
@@ -38,24 +56,33 @@ router.get("/", (req, res) => {
     `;
     params = [user_id];
   }
+
   connectDB.query(sql, params, (err, results) => {
-    if (err)
+    if (err) {
+      console.error("DB error:", err);
       return res
         .status(500)
         .json({ success: false, message: "Database error" });
+    }
     res.json({ success: true, feedbacks: results });
   });
 });
 
 // REPLY to feedback
 router.post("/:id/reply", (req, res) => {
-  const sql = `UPDATE feedback SET reply=?, status='replied', updated_at=NOW() WHERE id=?`;
+  const sql = `
+    UPDATE feedback
+    SET reply=?, status='replied', updated_at=NOW()
+    WHERE id=?
+  `;
   connectDB.query(sql, [req.body.reply, req.params.id], (err) => {
-    if (err)
+    if (err) {
+      console.error("DB error:", err);
       return res
         .status(500)
         .json({ success: false, message: "Database error" });
-    res.json({ success: true, message: "Reply saved" });
+    }
+    res.json({ success: true, message: "Reply saved", reply: req.body.reply });
   });
 });
 
@@ -65,14 +92,17 @@ router.delete("/:id", (req, res) => {
     "DELETE FROM feedback WHERE id=?",
     [req.params.id],
     (err, result) => {
-      if (err)
+      if (err) {
+        console.error("DB error:", err);
         return res
           .status(500)
           .json({ success: false, message: "Database error" });
-      if (result.affectedRows === 0)
+      }
+      if (result.affectedRows === 0) {
         return res
           .status(404)
           .json({ success: false, message: "Feedback not found" });
+      }
       res.json({ success: true, message: "Feedback deleted" });
     }
   );

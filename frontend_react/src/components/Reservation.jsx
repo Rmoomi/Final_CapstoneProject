@@ -14,7 +14,7 @@ function Reservation() {
   const [loading, setLoading] = useState(false);
   const [reservations, setReservations] = useState([]); // ✅ store all reservations
 
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+  const API_URL = import.meta.env.VITE_API_URL;
 
   // ✅ Load logged-in user from localStorage
   useEffect(() => {
@@ -28,8 +28,19 @@ function Reservation() {
   // ✅ Fetch ALL reservations for this user
   const fetchReservations = async (userId) => {
     try {
-      const res = await fetch(`${API_URL}/api/reservations`);
-      const result = await res.json();
+      console.log(
+        "📡 Fetching reservations from:",
+        `${API_URL}/api/reservations`
+      );
+
+      const res = await fetch(`${API_URL}/api/reservations`, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const text = await res.text(); // 👀 To debug what comes back
+      console.log("🔍 Raw response:", text);
+
+      const result = JSON.parse(text);
 
       if (result.success && result.reservations) {
         const userReservations = result.reservations.filter(
@@ -38,9 +49,11 @@ function Reservation() {
 
         userReservations.sort((a, b) => new Date(b.date) - new Date(a.date));
         setReservations(userReservations);
+      } else {
+        console.warn("⚠️ No reservations found or invalid format:", result);
       }
     } catch (err) {
-      console.error("Error fetching reservations:", err);
+      console.error("❌ Error fetching reservations:", err);
     }
   };
 

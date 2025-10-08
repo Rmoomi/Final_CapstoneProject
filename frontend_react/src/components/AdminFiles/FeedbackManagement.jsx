@@ -15,10 +15,11 @@ function FeedbackManagement() {
       try {
         const res = await fetch(`${API_URL}/api/feedback`);
         if (!res.ok) throw new Error(`Failed to fetch feedback: ${res.status}`);
-        const data = await res.json();
 
-        const feedbackArray = Array.isArray(data) ? data : data.feedbacks || [];
-        setFeedbacks(feedbackArray);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || "API error");
+
+        setFeedbacks(data.feedbacks || []);
       } catch (err) {
         console.error("Error fetching feedback:", err);
         setError("Could not load feedback. Please try again later.");
@@ -43,12 +44,17 @@ function FeedbackManagement() {
       if (!res.ok) throw new Error("Failed to send reply");
 
       const data = await res.json();
+      if (!data.success) throw new Error(data.message || "Reply error");
 
       // ✅ Update with reply
       setFeedbacks((prev) =>
         prev.map((fb) =>
           fb.id === feedbackId
-            ? { ...fb, reply: data.reply || replyText[feedbackId] }
+            ? {
+                ...fb,
+                reply: data.reply || replyText[feedbackId],
+                status: "replied",
+              }
             : fb
         )
       );

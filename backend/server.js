@@ -1,22 +1,31 @@
+// server.js
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const routes = require("./routes");
-require("./db"); // ✅ Ensure MySQL connects
+require("dotenv").config();
+require("./db");
 
 const app = express();
 app.use(express.json());
-app.use(cors());
 
-// ✅ API routes (all inside /api prefix)
+// ✅ Allow your Firebase Hosting domain + ngrok to call your backend
+app.use("*", cors());
+
+// ✅ Make uploads folder accessible to frontend
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// ✅ Use routes
 app.use("/api", routes);
 
-// Start server
-const PORT = 8080;
-const HOST = "0.0.0.0"; // ✅ allows access from other devices
+// ✅ Server listener — no need to hardcode ngrok
+const PORT = process.env.PORT || 8080;
+const HOST = "0.0.0.0";
 
 app.listen(PORT, HOST, () => {
-  console.log(`✅ Server running locally on http://${HOST}:${PORT}`);
-  console.log(`🌐 Try http://<your-local-ip>:${PORT} from another device`);
-  console.log(`👉 Now run: ngrok http ${PORT} in a separate terminal`);
+  console.log("✅ Server running locally");
+  console.log(`🌐 Local: http://localhost:${PORT}`);
+  console.log(
+    `🌐 Accessible via ngrok: https://<your-ngrok-subdomain>.ngrok-free.app`
+  );
 });

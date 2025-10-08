@@ -136,6 +136,114 @@ body {
   background: #0056b3;
   transform: scale(1.01);
 }
+/* === Admin Modal Overlay === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 10, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+/* === Admin Modal Overlay === */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 15, 15, 0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+}
+
+/* === Modal Box === */
+
+
+.modal-box {
+  position: relative;
+  background: #222;
+  color: #fff;
+  padding: 28px;
+  border-radius: 10px;
+  width: 380px;
+  text-align: center;
+  border: 1px solid rgba(255, 0, 0, 0.4);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+}
+
+.modal-box h2 {
+  font-size: 20px;
+  color: #ff4d4d;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.modal-box p {
+  font-size: 15px;
+  line-height: 1.5;
+  margin-bottom: 18px;
+  color: #ccc;
+}
+
+.modal-box .danger {
+  color: #ff4d4d;
+  font-weight: 600;
+}
+
+/* === Close Button === */
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #bbb;
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+.modal-close:hover {
+  color: #ff4d4d;
+}
+
+/* === Proceed Button === */
+.proceed-btn {
+  background: #ff4d4d;
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  font-size: 15px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+.proceed-btn:hover {
+  background: #e63939;
+  transform: translateY(-2px);
+}
+
+/* === Fade In Animation === */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 
 /* -------------------------
    RESPONSIVE DESIGN

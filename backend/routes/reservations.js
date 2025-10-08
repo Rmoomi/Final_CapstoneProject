@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const path = require("path");
 const connectDB = require("../db");
+const admin = require("../services/firebaseAdmin"); // ✅ Firebase Admin SDK
 
 const router = express.Router();
 
@@ -56,9 +57,10 @@ router.get("/", (req, res) => {
   );
 });
 
-// UPDATE reservation
+// UPDATE reservation (Admin Approval)
 router.put("/:id", (req, res) => {
-  const { cemetery, fullname, contact, date, status } = req.body;
+  const { cemetery, fullname, contact, date, status, user_id } = req.body;
+
   const sql = `UPDATE reservations 
     SET cemetery=?, fullname=?, contact=?, date=?, status=? 
     WHERE id=?`;
@@ -73,6 +75,81 @@ router.put("/:id", (req, res) => {
           .status(500)
           .json({ success: false, message: "Database error" });
       }
+
+      // ✅ If approved, save notification & send push
+      if (status === "approved" && user_id) {
+        const title = "Reservation Approved";
+        const body = "Your reservation has been approved.";
+
+        // 1️⃣ Save notification in DB
+        const notifSql = `
+          INSERT INTO notifications (user_id, title, message, status, date)
+          VALUES (?, ?, ?, 'unread', NOW())
+        `;
+        connectDB.query(notifSql, [user_id, title, body], (notifErr) => {
+          if (notifErr) console.error("Error saving notification:", notifErr);
+        });
+
+        // 2️⃣ Fetch tokens for that user
+        connectDB.query(
+          "SELECT token FROM fcm_tokens WHERE user_id = ?",
+          [user_id],
+          async (tokenErr, rows) => {
+            if (tokenErr) {
+              console.error("Error fetching tokens:", tokenErr);
+              return;
+            }
+
+            const tokens = rows.map((r) => r.token).filter(Boolean);
+            if (!tokens.length) {
+              console.log("⚠️ No FCM tokens found for user:", user_id);
+              return;
+            }
+
+            try {
+              // 3️⃣ Send push via Firebase Admin
+              const message = {
+                notification: { title, body },
+                tokens,
+              };
+
+              const response = await admin.messaging().sendMulticast(message);
+              console.log(
+                `✅ FCM sent: ${response.successCount} success, ${response.failureCount} failed`
+              );
+
+              // 4️⃣ Remove invalid tokens
+              const invalidTokens = [];
+              response.responses.forEach((resp, idx) => {
+                if (!resp.success) {
+                  const errCode = resp.error?.code;
+                  if (
+                    errCode === "messaging/registration-token-not-registered" ||
+                    errCode === "messaging/invalid-registration-token"
+                  ) {
+                    invalidTokens.push(tokens[idx]);
+                  } else {
+                    console.warn("FCM send error:", resp.error);
+                  }
+                }
+              });
+
+              if (invalidTokens.length) {
+                const delSql = `DELETE FROM fcm_tokens WHERE token IN (${invalidTokens
+                  .map(() => "?")
+                  .join(",")})`;
+                connectDB.query(delSql, invalidTokens, (delErr) => {
+                  if (delErr)
+                    console.error("Failed to remove invalid tokens:", delErr);
+                });
+              }
+            } catch (sendErr) {
+              console.error("Error sending FCM:", sendErr);
+            }
+          }
+        );
+      }
+
       res.json({ success: true, message: "Reservation updated" });
     }
   );

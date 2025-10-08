@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "../admin_css/ReservationManagement.css";
 
-// ✅ Import icons
 import editIcon from "../../assets/edit-icon.png";
 import deleteIcon from "../../assets/delete-icon.png";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function ReservationManagement() {
   const [reservations, setReservations] = useState([]);
@@ -16,11 +17,8 @@ function ReservationManagement() {
     date: "",
     status: "pending",
   });
-
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
-
-  // ✅ Photo modal state
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
   useEffect(() => {
@@ -29,29 +27,24 @@ function ReservationManagement() {
 
   const fetchReservations = async () => {
     try {
-      const res = await axios.get("http://localhost:8080/api/reservations");
+      const res = await axios.get(`${API_URL}/api/reservations`);
       if (res.data.success) setReservations(res.data.reservations);
     } catch (err) {
       console.error("Error fetching reservations:", err);
     }
   };
 
-  // ✅ Approve reservation and send notification
   async function handleApproveReservation(reservation) {
     try {
-      await axios.put(
-        `http://localhost:8080/api/reservations/${reservation.id}`,
-        {
-          cemetery: reservation.cemetery,
-          fullname: reservation.fullname,
-          contact: reservation.contact,
-          date: reservation.date,
-          status: "approved",
-        }
-      );
+      await axios.put(`${API_URL}/api/reservations/${reservation.id}`, {
+        cemetery: reservation.cemetery,
+        fullname: reservation.fullname,
+        contact: reservation.contact,
+        date: reservation.date,
+        status: "approved",
+      });
 
-      // ✅ Insert notification
-      await axios.post("http://localhost:8080/api/notifications", {
+      await axios.post(`${API_URL}/api/notifications`, {
         user_id: reservation.user_id,
         title: "Reservation Approved ✅",
         message: `Hello ${reservation.fullname}, your reservation at ${reservation.cemetery} on ${reservation.date} has been approved.`,
@@ -69,7 +62,7 @@ function ReservationManagement() {
     if (!window.confirm("Are you sure you want to delete this reservation?"))
       return;
     try {
-      await axios.delete(`http://localhost:8080/api/reservations/${id}`);
+      await axios.delete(`${API_URL}/api/reservations/${id}`);
       fetchReservations();
     } catch (err) {
       console.error("Error deleting reservation:", err);
@@ -78,9 +71,9 @@ function ReservationManagement() {
 
   const handleUpdate = async (id, currentStatus) => {
     try {
-      await axios.put(`http://localhost:8080/api/reservations/${id}`, {
+      await axios.put(`${API_URL}/api/reservations/${id}`, {
         ...formData,
-        status: currentStatus === "approved" ? "approved" : formData.status, // ✅ keep approved
+        status: currentStatus === "approved" ? "approved" : formData.status,
       });
 
       setEditing(null);
@@ -101,7 +94,6 @@ function ReservationManagement() {
     });
   };
 
-  // ✅ Stats
   const totalReservations = reservations.length;
   const pendingCount = reservations.filter(
     (r) => r.status === "pending"
@@ -110,7 +102,6 @@ function ReservationManagement() {
     (r) => r.status === "approved"
   ).length;
 
-  // ✅ Apply search & filter
   const filteredReservations = reservations.filter((r) => {
     const matchesSearch =
       r.fullname.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -130,7 +121,6 @@ function ReservationManagement() {
         <button className="btn-primary">+ New Reservation</button>
       </div>
 
-      {/* ✅ Stats cards */}
       <div className="stats">
         <div className="card">
           <h3>Total Reservations</h3>
@@ -146,7 +136,6 @@ function ReservationManagement() {
         </div>
       </div>
 
-      {/* ✅ Search + filters */}
       <div className="filters">
         <input
           type="text"
@@ -164,7 +153,6 @@ function ReservationManagement() {
         </select>
       </div>
 
-      {/* ✅ Reservations table */}
       <table className="reservations-table">
         <thead>
           <tr>
@@ -227,7 +215,7 @@ function ReservationManagement() {
                         onChange={(e) =>
                           setFormData({ ...formData, status: e.target.value })
                         }
-                        disabled={r.status === "approved"} // ✅ lock if approved
+                        disabled={r.status === "approved"}
                       >
                         <option value="pending">Pending</option>
                         <option value="approved">Approved</option>
@@ -238,7 +226,7 @@ function ReservationManagement() {
                         <button
                           className="btn-view-photo"
                           onClick={() =>
-                            setSelectedPhoto(`/uploads/${r.photo}`)
+                            setSelectedPhoto(`${API_URL}/uploads/${r.photo}`)
                           }
                         >
                           View Photo
@@ -277,7 +265,7 @@ function ReservationManagement() {
                         <button
                           className="btn-view-photo"
                           onClick={() =>
-                            setSelectedPhoto(`/uploads/${r.photo}`)
+                            setSelectedPhoto(`${API_URL}/uploads/${r.photo}`)
                           }
                         >
                           View Photo
@@ -328,20 +316,24 @@ function ReservationManagement() {
         </tbody>
       </table>
 
-      {/* ✅ Modal for viewing photo */}
+      {/* ✅ Photo Modal */}
       {selectedPhoto && (
         <div className="photo-modal" onClick={() => setSelectedPhoto(null)}>
           <div
             className="photo-modal-content"
             onClick={(e) => e.stopPropagation()}
           >
-            <img src={selectedPhoto} alt="reservation full" />
             <button
-              className="btn-close"
+              className="btn-close-top"
               onClick={() => setSelectedPhoto(null)}
             >
-              ✖ Close
+              ✖
             </button>
+            <img
+              src={selectedPhoto}
+              alt="Reservation"
+              className="modal-photo"
+            />
           </div>
         </div>
       )}

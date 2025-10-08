@@ -1,0 +1,11 @@
+# Ignore dependencies
+/node_modules
+
+# Ignore environment variables
+/.env
+
+# Ignore Firebase service account (private key)
+/serviceAccount.json
+
+# Ignore uploads folder (optional, if temporary)
+/uploads

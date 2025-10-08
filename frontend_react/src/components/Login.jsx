@@ -2,21 +2,22 @@ import "./css/Login.css";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import adminIcon from "../assets/admin_icon.png";
+import { requestFcmToken } from "../firebase"; // ✅ FCM helper
 
 function Login() {
   const navigate = useNavigate();
   const [showError, setShowError] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [displayInput, setInput] = useState({
+  const [showAdminModal, setShowAdminModal] = useState(false);
+  const [displayInput, setDisplayInput] = useState({
     email: "",
     pass: "",
   });
 
-  // ✅ Use backend URL (set in .env or fallback to localhost:8080)
-  const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleLogin = async () => {
-    setLoading(true); // ✅ start loading
+    setLoading(true);
     try {
       const res = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
@@ -28,10 +29,35 @@ function Login() {
       console.log("Server says:", data);
 
       if (res.ok && data.success) {
-        // ✅ Save user info
+        // ✅ Save user info locally
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        // ✅ Redirect
+        // ✅ Request FCM token after login
+        try {
+          const token = await requestFcmToken();
+          if (token) {
+            const registerRes = await fetch(`${API_URL}/api/fcm/register`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                user_id: data.user.id,
+                token,
+              }),
+            });
+
+            if (registerRes.ok) {
+              console.log("✅ FCM token registered successfully");
+            } else {
+              console.warn("⚠️ Failed to register token on backend");
+            }
+          } else {
+            console.warn("⚠️ No FCM token received (permission denied?)");
+          }
+        } catch (e) {
+          console.error("⚠️ FCM registration error:", e);
+        }
+
+        // ✅ Redirect to homepage
         navigate("/homepage");
       } else {
         showErrorMessage();
@@ -40,7 +66,7 @@ function Login() {
       console.error("Error logging in:", err);
       showErrorMessage();
     } finally {
-      setLoading(false); // ✅ stop loading
+      setLoading(false);
     }
   };
 
@@ -49,17 +75,17 @@ function Login() {
     setTimeout(() => setShowError(false), 3000);
   };
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setInput((prevData) => ({
-      ...prevData,
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setDisplayInput((prev) => ({
+      ...prev,
       [name]: value,
     }));
   };
 
   return (
     <>
-      {/* ✅ Error Pop-up */}
+      {/* ❌ Error Pop-up */}
       <div className={`popup ${showError ? "show" : ""}`}>
         INVALID USERNAME OR PASSWORD
       </div>
@@ -70,7 +96,7 @@ function Login() {
           alt="Admin Login"
           className="to_admin_login"
           style={{ cursor: "pointer", width: "40px", marginBottom: "16px" }}
-          onClick={() => navigate("/admin/login")}
+          onClick={() => setShowAdminModal(true)}
         />
         <div className="login-box">
           <h2>Welcome To Everest Portal</h2>
@@ -113,6 +139,32 @@ function Login() {
           </p>
         </div>
       </main>
+
+      {/* ⚠️ Admin Modal */}
+      {showAdminModal && (
+        <div className="modal-overlay">
+          <div className="modal-box scary">
+            <button
+              className="modal-close"
+              onClick={() => setShowAdminModal(false)}
+            >
+              ✖
+            </button>
+            <h2>RESTRICTED AREA</h2>
+            <p>
+              Only <strong>AUTHORIZED PERSONNEL</strong> may proceed.
+              Unauthorized access will be <span className="danger">DENIED</span>
+              .
+            </p>
+            <button
+              className="proceed-btn"
+              onClick={() => navigate("/admin/login")}
+            >
+              PROCEED
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

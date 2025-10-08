@@ -37,7 +37,7 @@ function NavLayout() {
             navigate("/homepage");
           }}
         >
-          <span className="logo-icon">📍</span> EveRest Portal
+          <span className="logo-icon"></span> EveRest Portal
         </div>
 
         {/* Hamburger (mobile only) */}
